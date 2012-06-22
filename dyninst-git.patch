@@ -1,0 +1,12 @@
+diff -up dyninst-7.99/dyninst/make.config.git dyninst-7.99/dyninst/make.config
+--- dyninst-7.99/dyninst/make.config.git	2012-06-19 14:04:19.849002895 -0400
++++ dyninst-7.99/dyninst/make.config	2012-06-19 14:04:38.971000002 -0400
+@@ -5,7 +5,7 @@
+ #
+ 
+ SUITE_NAME	= Paradyn
+-RELEASE_NUM	= 8.0
++RELEASE_NUM	= 7.99
+ 
+ # ***** EXTERNAL SOFTWARE CONFIGURATION *****
+ 

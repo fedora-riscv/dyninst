@@ -1,0 +1,12 @@
+diff -up dyninst-8.0/dyninst/Makefile.notest dyninst-8.0/dyninst/Makefile
+--- dyninst-8.0/dyninst/Makefile.notest	2012-06-12 16:43:01.409000013 -0400
++++ dyninst-8.0/dyninst/Makefile	2012-06-12 16:43:20.417998282 -0400
+@@ -44,7 +44,7 @@ $(Everything_install) $(Everything_tests
+ $(Test_targets):
+ 	@$(MAKE) -C testsuite/$(PLATFORM) $(@:%_testsuite=%)
+ 
+-install: intro ready $(fullSystem_install) testsuite_install
++install: intro ready $(fullSystem_install)
+ 
+ world: intro $(fullSystem)
+ depend:
