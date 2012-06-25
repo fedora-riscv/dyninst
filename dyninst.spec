@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.12%{?dist}
+Release: 0.14%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -14,13 +14,11 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ e3ed0acc46dcecb88db6a884fe8cdcc0bf4fde9d > dyninst-7.99.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ c6ac3093d5c6a9480c575d9930bf8428bcf47f2a > dyninst-7.99.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
 #  git archive --format=tar.gz fe92e5b28804791ecadc893e469bc2215dbc3066 > dyninst-docs-7.99.tar.gz
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
-Patch1: dyninst-notest.patch
-Patch2: dyninst-vers.patch
 # Change version number so official dyninst 8.0 will replace it
 Patch3: dyninst-git.patch
 BuildRequires: libxml2-devel >= 2.7.8
@@ -59,8 +57,6 @@ the dyninst user-space libraries and interfaces.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1
-%patch2 -p0 -b .vers
 %patch3 -p1 -b .git
 
 %build
@@ -125,6 +121,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Mon Jun 25 2012 William Cohen <wcohen@redhat.com> - 7.99-0.14
+- Rebase on newer git repo.
+
 * Tue Jun 19 2012 William Cohen <wcohen@redhat.com> - 7.99-0.12
 - Fix static library and header file permissions.
 - Use sources from the dyninst git repositories.
