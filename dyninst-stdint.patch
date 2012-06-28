@@ -1,0 +1,23 @@
+diff -up dyninst-7.99/dyninst/common/src/dwarfExpr.C.stdint dyninst-7.99/dyninst/common/src/dwarfExpr.C
+--- dyninst-7.99/dyninst/common/src/dwarfExpr.C.stdint	2012-06-27 10:54:00.000000000 -0400
++++ dyninst-7.99/dyninst/common/src/dwarfExpr.C	2012-06-28 12:25:45.384998827 -0400
+@@ -29,6 +29,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#include <stdint.h>
+ #include <stack>
+ #include "dynutil/h/dyn_regs.h"
+ #include "common/h/dwarfExpr.h"
+diff -up dyninst-7.99/dyninst/proccontrol/src/handler.C.stdint dyninst-7.99/dyninst/proccontrol/src/handler.C
+--- dyninst-7.99/dyninst/proccontrol/src/handler.C.stdint	2012-06-28 12:35:38.218003723 -0400
++++ dyninst-7.99/dyninst/proccontrol/src/handler.C	2012-06-28 12:36:04.286000028 -0400
+@@ -28,6 +28,8 @@
+  * License along with this library; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
++
++#include <cstring>
+ #include "proccontrol/h/Handler.h"
+ #include "proccontrol/h/PCErrors.h"
+ #include "proccontrol/h/PCProcess.h"

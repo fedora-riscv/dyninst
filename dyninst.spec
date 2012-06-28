@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.14%{?dist}
+Release: 0.16%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -14,13 +14,14 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ c6ac3093d5c6a9480c575d9930bf8428bcf47f2a > dyninst-7.99.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ da99839b9f188c7d30282be78b23d8687755efad >  dyninst-7.99.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
 #  git archive --format=tar.gz fe92e5b28804791ecadc893e469bc2215dbc3066 > dyninst-docs-7.99.tar.gz
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
 # Change version number so official dyninst 8.0 will replace it
 Patch3: dyninst-git.patch
+Patch4: dyninst-stdint.patch
 BuildRequires: libxml2-devel >= 2.7.8
 BuildRequires: libdwarf-devel 
 BuildRequires: elfutils-libelf-devel
@@ -58,6 +59,7 @@ the dyninst user-space libraries and interfaces.
 %setup -q -T -D -a 1
 
 %patch3 -p1 -b .git
+%patch4 -p1 -b .stdint
 
 %build
 
@@ -121,6 +123,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Thu Jun 28 2012 William Cohen <wcohen@redhat.com> - 7.99-0.16
+- Eliminate dynptr.h file use with rebase on newer git repo.
+
 * Mon Jun 25 2012 William Cohen <wcohen@redhat.com> - 7.99-0.14
 - Rebase on newer git repo.
 
