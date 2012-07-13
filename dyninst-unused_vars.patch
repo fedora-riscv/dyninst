@@ -1,0 +1,244 @@
+commit 59803a8928076463096fbaa8834ee15cd63852f9
+Author: William Cohen <wcohen@redhat.com>
+Date:   Mon Jul 9 15:25:42 2012 -0400
+
+    Remove the unused variable assignments for getenv() calls
+    
+    There were a number of places in the code that assigned the return value
+    of getenv to a variable. However, the variable was never used in most cases.
+    This patch cleans up those unneeded assignments.
+
+diff --git a/common/src/Annotatable.C b/common/src/Annotatable.C
+index bdc67a0..2b9f875 100644
+--- a/common/src/Annotatable.C
++++ b/common/src/Annotatable.C
+@@ -75,16 +75,15 @@ void annotations_debug_init()
+ {
+ 	if (dyn_debug_annotations) return;
+ 
+-	char *p;
+-	if ( (p=getenv("DYNINST_DEBUG_ANNOTATIONS"))) {
++	if (getenv("DYNINST_DEBUG_ANNOTATIONS")) {
+ 		fprintf(stderr, "Enabling DyninstAPI annotations debug\n");
+ 		dyn_debug_annotations = true;
+ 	}
+-	else if ( (p=getenv("DYNINST_DEBUG_ANNOTATION"))) {
++	else if (getenv("DYNINST_DEBUG_ANNOTATION")) {
+ 		fprintf(stderr, "Enabling DyninstAPI annotations debug\n");
+ 		dyn_debug_annotations = true;
+ 	}
+-	else if ( (p=getenv("DYNINST_DEBUG_ANNOTATABLE"))) {
++	else if (getenv("DYNINST_DEBUG_ANNOTATABLE")) {
+ 		fprintf(stderr, "Enabling DyninstAPI annotations debug\n");
+ 		dyn_debug_annotations = true;
+ 	}
+diff --git a/dataflowAPI/src/debug_dataflow.C b/dataflowAPI/src/debug_dataflow.C
+index d1adf11..6499375 100644
+--- a/dataflowAPI/src/debug_dataflow.C
++++ b/dataflowAPI/src/debug_dataflow.C
+@@ -54,34 +54,32 @@ bool df_init_debug() {
+   if (init) return true;
+   init = true;
+ 
+-  char *p;
+-
+ #if defined(_MSC_VER)
+ #pragma warning(push)
+ #pragma warning(disable:4996) 
+ #endif
+ 
+-  if ((p=getenv("DATAFLOW_DEBUG_STACKANALYSIS"))) {
++  if ((getenv("DATAFLOW_DEBUG_STACKANALYSIS"))) {
+     fprintf(stderr, "Enabling DataflowAPI stack analysis debugging\n");
+     df_debug_stackanalysis = 1;
+   }
+ 
+-  if ((p=getenv("DATAFLOW_DEBUG_SLICING"))) {
++  if ((getenv("DATAFLOW_DEBUG_SLICING"))) {
+     fprintf(stderr, "Enabling DataflowAPI slicing debugging\n");
+     df_debug_slicing = 1;
+   }
+ 
+-  if ((p=getenv("DATAFLOW_DEBUG_CONVERT"))) {
++  if ((getenv("DATAFLOW_DEBUG_CONVERT"))) {
+     fprintf(stderr, "Enabling DataflowAPI->ROSE conversion debugging\n");
+     df_debug_convert = 1;
+   }
+ 
+-  if ((p=getenv("DATAFLOW_DEBUG_EXPAND"))) {
++  if ((getenv("DATAFLOW_DEBUG_EXPAND"))) {
+     fprintf(stderr, "Enabling DataflowAPI symbolic expansion debugging\n");
+     df_debug_expand = 1;
+   }
+ 
+-  if ((p=getenv("DATAFLOW_DEBUG_LIVENESS"))) {
++  if ((getenv("DATAFLOW_DEBUG_LIVENESS"))) {
+     fprintf(stderr, "Enabling DataflowAPI liveness debugging\n");
+     df_debug_liveness = 1;
+   }
+diff --git a/dyninstAPI/src/Relocation/patchapi_debug.C b/dyninstAPI/src/Relocation/patchapi_debug.C
+index 474ba0f..14fa96a 100644
+--- a/dyninstAPI/src/Relocation/patchapi_debug.C
++++ b/dyninstAPI/src/Relocation/patchapi_debug.C
+@@ -45,15 +45,14 @@ bool init_debug_patchapi() {
+   if (init) return true;
+   init = true;
+ 
+-  char *p;
+-  if ( (p=getenv("DYNINST_DEBUG_RELOCATION")) ||
+-       (p=getenv("PATCHAPI_DEBUG_RELOCATION"))) {
++  if ( getenv("DYNINST_DEBUG_RELOCATION") ||
++       getenv("PATCHAPI_DEBUG_RELOCATION")) {
+      fprintf(stderr, "Enabling DyninstAPI relocation debug\n");
+      patch_debug_relocation = 1;
+   }
+ 
+-  if ( (p=getenv("DYNINST_DEBUG_SPRINGBOARD")) ||
+-       (p=getenv("PATCHAPI_DEBUG_SPRINGBOARD"))) {
++  if ( getenv("DYNINST_DEBUG_SPRINGBOARD") ||
++       getenv("PATCHAPI_DEBUG_SPRINGBOARD")) {
+      fprintf(stderr, "Enabling DyninstAPI springboard debug\n");
+      patch_debug_relocation = 1;
+   }
+diff --git a/dyninstAPI/src/debug.C b/dyninstAPI/src/debug.C
+index 8bb677b..a6ecc86 100644
+--- a/dyninstAPI/src/debug.C
++++ b/dyninstAPI/src/debug.C
+@@ -243,19 +243,19 @@ bool init_debug() {
+   init = true;
+ 
+   char *p;
+-  if ( (p=getenv("DYNINST_DEBUG_MALWARE"))) {
++  if (getenv("DYNINST_DEBUG_MALWARE")) {
+     fprintf(stderr, "Enabling DyninstAPI malware debug\n");
+     dyn_debug_malware = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_TRAP"))) {
++  if (getenv("DYNINST_DEBUG_TRAP")) {
+     fprintf(stderr, "Enabling DyninstAPI debugging using traps\n");
+     dyn_debug_trap = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_SPRINGBOARD"))) {
++  if (getenv("DYNINST_DEBUG_SPRINGBOARD")) {
+     fprintf(stderr, "Enabling DyninstAPI springboard debug\n");
+     dyn_debug_springboard = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_STARTUP"))) {
++  if (getenv("DYNINST_DEBUG_STARTUP")) {
+     fprintf(stderr, "Enabling DyninstAPI startup debug\n");
+     dyn_debug_startup = 1;
+   }
+@@ -271,68 +271,68 @@ bool init_debug() {
+ 	    dyn_debug_parsing = 1;
+ 	  }
+   }
+-  if (    (p=getenv("DYNINST_DEBUG_DYNPC")) 
+-       || (p=getenv("DYNINST_DEBUG_FORKEXEC")) 
+-       || (p=getenv("DYNINST_DEBUG_INFRPC"))
+-       || (p=getenv("DYNINST_DEBUG_SIGNAL"))
+-       || (p=getenv("DYNINST_DEBUG_INFERIORRPC"))
+-       || (p=getenv("DYNINST_DEBUG_THREAD"))
+-       || (p=getenv("DYNINST_DEBUG_MAILBOX"))
+-       || (p=getenv("DYNINST_DEBUG_DBI"))
++  if (    getenv("DYNINST_DEBUG_DYNPC")
++       || getenv("DYNINST_DEBUG_FORKEXEC")
++       || getenv("DYNINST_DEBUG_INFRPC")
++       || getenv("DYNINST_DEBUG_SIGNAL")
++       || getenv("DYNINST_DEBUG_INFERIORRPC")
++       || getenv("DYNINST_DEBUG_THREAD")
++       || getenv("DYNINST_DEBUG_MAILBOX")
++       || getenv("DYNINST_DEBUG_DBI")
+      ) 
+   {
+     fprintf(stderr, "Enabling DyninstAPI process control debug\n");
+     dyn_debug_proccontrol = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_STACKWALK"))) {
++  if (getenv("DYNINST_DEBUG_STACKWALK")) {
+     fprintf(stderr, "Enabling DyninstAPI stack walking debug\n");
+     dyn_debug_stackwalk = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_INST"))) {
++  if (getenv("DYNINST_DEBUG_INST")) {
+     fprintf(stderr, "Enabling DyninstAPI inst debug\n");
+     dyn_debug_inst = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_RELOC"))) {
++  if (getenv("DYNINST_DEBUG_RELOC")) {
+     fprintf(stderr, "Enabling DyninstAPI relocation debug\n");
+     dyn_debug_reloc = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_RELOCATION"))) {
++  if (getenv("DYNINST_DEBUG_RELOCATION")) {
+     fprintf(stderr, "Enabling DyninstAPI relocation debug\n");
+     dyn_debug_reloc = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_SENSITIVITY"))) {
++  if (getenv("DYNINST_DEBUG_SENSITIVITY")) {
+     fprintf(stderr, "Enabling DyninstAPI sensitivity debug\n");
+     dyn_debug_sensitivity = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_DYN_UNW"))) {
++  if (getenv("DYNINST_DEBUG_DYN_UNW")) {
+     fprintf(stderr, "Enabling DyninstAPI dynamic unwind debug\n");
+     dyn_debug_dyn_unw = 1;
+     }
+-  if ( (p=getenv("DYNINST_DEBUG_MUTEX"))) {
++  if (getenv("DYNINST_DEBUG_MUTEX")) {
+     fprintf(stderr, "Enabling DyninstAPI mutex debug\n");
+     dyn_debug_mutex = 1;
+     }
+-  if ( (p=getenv("DYNINST_DEBUG_DWARF"))) {
++  if (getenv("DYNINST_DEBUG_DWARF")) {
+     fprintf(stderr, "Enabling DyninstAPI dwarf debug\n");
+     dyn_debug_dwarf= 1;
+     }
+-  if ( (p=getenv("DYNINST_DEBUG_RTLIB"))) {
++  if (getenv("DYNINST_DEBUG_RTLIB")) {
+       fprintf(stderr, "Enabling DyninstAPI RTlib debug\n");
+       dyn_debug_rtlib = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_CATCHUP"))) {
++  if (getenv("DYNINST_DEBUG_CATCHUP")) {
+       fprintf(stderr, "Enabling DyninstAPI catchup debug\n");
+       dyn_debug_catchup = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_BPATCH"))) {
++  if (getenv("DYNINST_DEBUG_BPATCH")) {
+       fprintf(stderr, "Enabling DyninstAPI bpatch debug\n");
+       dyn_debug_bpatch = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_REGALLOC"))) {
++  if (getenv("DYNINST_DEBUG_REGALLOC")) {
+       fprintf(stderr, "Enabling DyninstAPI register allocation debug\n");
+       dyn_debug_regalloc = 1;
+   }
+-  if ( (p=getenv("DYNINST_DEBUG_AST"))) {
++  if (getenv("DYNINST_DEBUG_AST")) {
+       fprintf(stderr, "Enabling DyninstAPI ast debug\n");
+       dyn_debug_ast = 1;
+   }
+@@ -351,7 +351,7 @@ bool init_debug() {
+      dyn_debug_crash = 1;
+      dyn_debug_crash_debugger = p;
+   }
+-  if ((p=getenv("DYNINST_DEBUG_DISASS"))) {
++  if (getenv("DYNINST_DEBUG_DISASS")) {
+       fprintf(stderr, "Enabling DyninstAPI instrumentation disassembly debugging\n");
+       dyn_debug_disassemble = 1;
+   }
+diff --git a/parseAPI/src/SymtabCodeSource.C b/parseAPI/src/SymtabCodeSource.C
+index 660fa9d..72b0fcd 100644
+--- a/parseAPI/src/SymtabCodeSource.C
++++ b/parseAPI/src/SymtabCodeSource.C
+@@ -273,9 +273,7 @@ SymtabCodeSource::SymtabCodeSource(char * file) :
+ 
+ bool
+ SymtabCodeSource::init_stats() {
+-    char *p;
+-
+-    if ((p = getenv("DYNINST_STATS_PARSING"))) {
++    if ((getenv("DYNINST_STATS_PARSING"))) {
+         parsing_printf("[%s] Enabling ParseAPI parsing statistics\n", FILE__);
+         // General counts
+         stats_parse->add(PARSE_BLOCK_COUNT, CountStat);

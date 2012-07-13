@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.17%{?dist}
+Release: 0.18%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -14,14 +14,15 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ 590d6ca623a6f4b8dde1edff2742b2663d726329 >  dyninst-7.99.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ 96826d0b7cbec7deb1398019ecadea5cf756c9c7 >  dyninst-7.99.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
 #  git archive --format=tar.gz fe92e5b28804791ecadc893e469bc2215dbc3066 > dyninst-docs-7.99.tar.gz
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
 # Change version number so official dyninst 8.0 will replace it
 Patch3: dyninst-git.patch
-Patch4: dyninst-stdint.patch
+Patch5: dyninst-unused_vars.patch
+Patch6: dyninst-delete_array.patch
 BuildRequires: libxml2-devel >= 2.7.8
 BuildRequires: libdwarf-devel 
 BuildRequires: elfutils-libelf-devel
@@ -59,7 +60,11 @@ the dyninst user-space libraries and interfaces.
 %setup -q -T -D -a 1
 
 %patch3 -p1 -b .git
-%patch4 -p1 -b .stdint
+
+pushd dyninst
+%patch5 -p1 -b .unused
+%patch6 -p1 -b .delete
+popd
 
 %build
 
@@ -123,6 +128,12 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Fri Jul 13 2012 William Cohen <wcohen@redhat.com> - 7.99-0.18
+- Rebase on newer git tree the has a number of merges into it.
+- Adjust spec file to allow direct use of git patches
+- Fix to eliminate unused varables.
+- Proper delete for array.
+
 * Thu Jun 28 2012 William Cohen <wcohen@redhat.com> - 7.99-0.17
 - Rebase on newer git repo.
 
