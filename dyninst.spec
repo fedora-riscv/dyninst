@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.18%{?dist}
+Release: 0.19%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -23,6 +23,7 @@ Source1: %{name}-docs-%{version}.tar.gz
 Patch3: dyninst-git.patch
 Patch5: dyninst-unused_vars.patch
 Patch6: dyninst-delete_array.patch
+Patch7: dyninst-common-makefile.patch
 BuildRequires: libxml2-devel >= 2.7.8
 BuildRequires: libdwarf-devel 
 BuildRequires: elfutils-libelf-devel
@@ -64,6 +65,7 @@ the dyninst user-space libraries and interfaces.
 pushd dyninst
 %patch5 -p1 -b .unused
 %patch6 -p1 -b .delete
+%patch7 -p1 -b .common
 popd
 
 %build
@@ -128,6 +130,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Mon Jul 16 2012 William Cohen <wcohen@redhat.com> - 7.99-0.19
+- Patch common/i386-unknown-linux2.4/Makefile to build.
+
 * Fri Jul 13 2012 William Cohen <wcohen@redhat.com> - 7.99-0.18
 - Rebase on newer git tree the has a number of merges into it.
 - Adjust spec file to allow direct use of git patches
