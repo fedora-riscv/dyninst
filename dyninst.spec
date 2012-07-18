@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.19%{?dist}
+Release: 0.20%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -130,6 +130,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.99-0.20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Mon Jul 16 2012 William Cohen <wcohen@redhat.com> - 7.99-0.19
 - Patch common/i386-unknown-linux2.4/Makefile to build.
 
