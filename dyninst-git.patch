@@ -8,5 +8,5 @@ diff -up dyninst-7.99/dyninst/make.config.git dyninst-7.99/dyninst/make.config
 -RELEASE_NUM	= 8.0
 +RELEASE_NUM	= 7.99
  
- # ***** EXTERNAL SOFTWARE CONFIGURATION *****
- 
+ ifndef TO_CORE
+ TO_CORE		= ../..

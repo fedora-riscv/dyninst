@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.20%{?dist}
+Release: 0.21%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -14,7 +14,7 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ 96826d0b7cbec7deb1398019ecadea5cf756c9c7 >  dyninst-7.99.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ 1d17e0266d82c53f6e80f5bc658d93803aedbc8c >  dyninst-7.99.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
 #  git archive --format=tar.gz fe92e5b28804791ecadc893e469bc2215dbc3066 > dyninst-docs-7.99.tar.gz
 Source0: %{name}-%{version}.tar.gz
@@ -22,8 +22,6 @@ Source1: %{name}-docs-%{version}.tar.gz
 # Change version number so official dyninst 8.0 will replace it
 Patch3: dyninst-git.patch
 Patch5: dyninst-unused_vars.patch
-Patch6: dyninst-delete_array.patch
-Patch7: dyninst-common-makefile.patch
 BuildRequires: libxml2-devel >= 2.7.8
 BuildRequires: libdwarf-devel 
 BuildRequires: elfutils-libelf-devel
@@ -64,8 +62,6 @@ the dyninst user-space libraries and interfaces.
 
 pushd dyninst
 %patch5 -p1 -b .unused
-%patch6 -p1 -b .delete
-%patch7 -p1 -b .common
 popd
 
 %build
@@ -130,6 +126,12 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Wed Jul 25 2012 Josh Stone <jistone@redhat.com> - 7.99-0.21
+- Rebase on newer git tree
+- Update context in dyninst-git.patch
+- Drop dyninst-delete_array.patch
+- Drop dyninst-common-makefile.patch
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.99-0.20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
