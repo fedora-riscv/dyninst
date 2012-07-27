@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.21%{?dist}
+Release: 0.22%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -41,6 +41,7 @@ the creation of tools and applications that use run-time code patching.
 Summary: Header files for the compiling programs with Dyninst
 Group: Development/System
 Requires: dyninst = %{version}-%{release}
+Requires: boost-devel
 %description devel
 Dyninst-devel includes the C header files that specify the Dyninst user-space
 libraries and interfaces. This is required for rebuilding any program
@@ -126,6 +127,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Fri Jul 27 2012 William Cohen <wcohen@redhat.com> - 7.99-0.22
+- Correct requires for dyninst-devel.
+
 * Wed Jul 25 2012 Josh Stone <jistone@redhat.com> - 7.99-0.21
 - Rebase on newer git tree
 - Update context in dyninst-git.patch
