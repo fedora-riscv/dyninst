@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.22%{?dist}
+Release: 0.23%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -14,7 +14,7 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ 1d17e0266d82c53f6e80f5bc658d93803aedbc8c >  dyninst-7.99.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ 3bfdca4729e3f7967b2e1e895e80164ac7350105 >  dyninst-7.99.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
 #  git archive --format=tar.gz fe92e5b28804791ecadc893e469bc2215dbc3066 > dyninst-docs-7.99.tar.gz
 Source0: %{name}-%{version}.tar.gz
@@ -37,13 +37,19 @@ monitoring, and to support composing applications out of existing packages.
 The goal of this API is to provide a machine independent interface to permit
 the creation of tools and applications that use run-time code patching.
 
+%package doc
+Summary: Documentation for using the Dyninst API
+Group: Documentation
+%description doc
+dyninst-doc contains API documentation for the Dyninst libraries.
+
 %package devel
 Summary: Header files for the compiling programs with Dyninst
 Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: boost-devel
 %description devel
-Dyninst-devel includes the C header files that specify the Dyninst user-space
+dyninst-devel includes the C header files that specify the Dyninst user-space
 libraries and interfaces. This is required for rebuilding any program
 that uses Dyninst.
 
@@ -99,12 +105,17 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 
 # FIXME parseThat is not part of normal build
 #%{_bindir}/parseThat
+
+%dir %{_libdir}/dyninst
 %{_libdir}/dyninst/*.so.*
 
-# The README also contains the license information
-#%doc LICENSE
-%doc dyninst/dyninstAPI/README
+%doc dyninst/COPYRIGHT
+%doc dyninst/LGPL
 
+%config(noreplace) /etc/ld.so.conf.d/*
+
+%files doc
+%defattr(-,root,root,-)
 %doc depGraphAPI.pdf
 %doc dynC_API.pdf
 %doc dyninstProgGuide.pdf
@@ -114,8 +125,6 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %doc ProcControlAPI.pdf
 %doc stackwalk/stackwalker.pdf
 %doc dynC_API.pdf
-
-%config(noreplace) /etc/ld.so.conf.d/*
 
 %files devel
 %defattr(-,root,root,-)
@@ -127,6 +136,12 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Mon Jul 30 2012 Josh Stone <jistone@redhat.com> 7.99-0.23
+- Rebase on newer git tree.
+- Update license files with upstream additions.
+- Split documentation into -doc subpackage.
+- Claim ownership of %{_libdir}/dyninst.
+
 * Fri Jul 27 2012 William Cohen <wcohen@redhat.com> - 7.99-0.22
 - Correct requires for dyninst-devel.
 
