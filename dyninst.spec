@@ -4,7 +4,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.23%{?dist}
+Release: 0.24%{?dist}
 URL: http://www.dyninst.org
 Version: %version
 Exclusiveos: linux
@@ -22,6 +22,7 @@ Source1: %{name}-docs-%{version}.tar.gz
 # Change version number so official dyninst 8.0 will replace it
 Patch3: dyninst-git.patch
 Patch5: dyninst-unused_vars.patch
+Patch6: dyninst-ppc.patch
 BuildRequires: libxml2-devel >= 2.7.8
 BuildRequires: libdwarf-devel 
 BuildRequires: elfutils-libelf-devel
@@ -70,6 +71,7 @@ the dyninst user-space libraries and interfaces.
 pushd dyninst
 %patch5 -p1 -b .unused
 popd
+%patch6 -p1 -b .ppc
 
 %build
 
@@ -136,6 +138,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Wed Aug 15 2012 Karsten Hopp <karsten@redhat.com> 7.99-0.24
+- check if R_PPC_NUM is defined before using it, similar to R_PPC64_NUM
+
 * Mon Jul 30 2012 Josh Stone <jistone@redhat.com> 7.99-0.23
 - Rebase on newer git tree.
 - Update license files with upstream additions.
