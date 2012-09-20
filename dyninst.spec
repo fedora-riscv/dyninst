@@ -1,12 +1,10 @@
-%define version 7.99
-
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.24%{?dist}
+Release: 0.25%{?dist}
 URL: http://www.dyninst.org
-Version: %version
+Version: 7.99.1
 Exclusiveos: linux
 #Right now dyninst does not know about the following architectures
 ExcludeArch: s390 s390x %{arm}
@@ -14,17 +12,16 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ 3bfdca4729e3f7967b2e1e895e80164ac7350105 >  dyninst-7.99.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ c496f80d1c8ef29b6b2aab7e4114ba2dc38fa89d > dyninst-7.99.1.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
-#  git archive --format=tar.gz fe92e5b28804791ecadc893e469bc2215dbc3066 > dyninst-docs-7.99.tar.gz
+#  git archive --format=tar.gz 045689169ad35113756131efbbfeda2edb461874 > dyninst-docs-7.99.1.tar.gz
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
 # Change version number so official dyninst 8.0 will replace it
 Patch3: dyninst-git.patch
 Patch5: dyninst-unused_vars.patch
-Patch6: dyninst-ppc.patch
 BuildRequires: libxml2-devel >= 2.7.8
-BuildRequires: libdwarf-devel 
+BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
 
@@ -71,7 +68,6 @@ the dyninst user-space libraries and interfaces.
 pushd dyninst
 %patch5 -p1 -b .unused
 popd
-%patch6 -p1 -b .ppc
 
 %build
 
@@ -138,6 +134,12 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Thu Sep 20 2012 Josh Stone <jistone@redhat.com> 7.99.1-0.25
+- Rebase on newer git tree.
+- Bump the fake version to 7.99.1 to account for ABI differences.
+- Enforce the minimum libdwarf version.
+- Drop the upstreamed R_PPC_NUM patch.
+
 * Wed Aug 15 2012 Karsten Hopp <karsten@redhat.com> 7.99-0.24
 - check if R_PPC_NUM is defined before using it, similar to R_PPC64_NUM
 
