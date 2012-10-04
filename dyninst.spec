@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.25%{?dist}
+Release: 0.26%{?dist}
 URL: http://www.dyninst.org
 Version: 7.99.1
 Exclusiveos: linux
@@ -12,9 +12,12 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ c496f80d1c8ef29b6b2aab7e4114ba2dc38fa89d > dyninst-7.99.1.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ 557599ad7417610f179720ad88366c32a0557127 > dyninst-7.99.1.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
 #  git archive --format=tar.gz 045689169ad35113756131efbbfeda2edb461874 > dyninst-docs-7.99.1.tar.gz
+# Verify the commit ids with:
+#  gunzip -c dyninst-7.99.1.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-docs-7.99.1.tar.gz | git get-tar-commit-id
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
 # Change version number so official dyninst 8.0 will replace it
@@ -134,6 +137,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Wed Oct 03 2012 Josh Stone <jistone@redhat.com> 7.99.1-0.26
+- Rebase to git 557599ad7417610f179720ad88366c32a0557127
+
 * Thu Sep 20 2012 Josh Stone <jistone@redhat.com> 7.99.1-0.25
 - Rebase on newer git tree.
 - Bump the fake version to 7.99.1 to account for ABI differences.
