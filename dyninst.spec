@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.26%{?dist}
+Release: 0.27%{?dist}
 URL: http://www.dyninst.org
 Version: 7.99.1
 Exclusiveos: linux
@@ -12,9 +12,9 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ 557599ad7417610f179720ad88366c32a0557127 > dyninst-7.99.1.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ dd8f40b7b4742ad97098613876efeef46d3d9e65 > dyninst-7.99.1.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
-#  git archive --format=tar.gz 045689169ad35113756131efbbfeda2edb461874 > dyninst-docs-7.99.1.tar.gz
+#  git archive --format=tar.gz 6077804c447a8940624ea1db9d8f4d6bc7ac603e > dyninst-docs-7.99.1.tar.gz
 # Verify the commit ids with:
 #  gunzip -c dyninst-7.99.1.tar.gz | git get-tar-commit-id
 #  gunzip -c dyninst-docs-7.99.1.tar.gz | git get-tar-commit-id
@@ -77,7 +77,7 @@ popd
 cd dyninst
 
 %configure
-make \
+make %{?_smp_mflags} \
   DONT_BUILD_NEWTESTSUITE=1 \
   all StackwalkerAPI
 
@@ -137,6 +137,10 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Fri Oct 26 2012 Josh Stone <jistone@redhat.com> 7.99.1-0.27
+- Rebase to git dd8f40b7b4742ad97098613876efeef46d3d9e65
+- Use _smp_mflags to enable building in parallel.
+
 * Wed Oct 03 2012 Josh Stone <jistone@redhat.com> 7.99.1-0.26
 - Rebase to git 557599ad7417610f179720ad88366c32a0557127
 
