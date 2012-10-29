@@ -2,9 +2,9 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.27%{?dist}
+Release: 0.28%{?dist}
 URL: http://www.dyninst.org
-Version: 7.99.1
+Version: 7.99.2
 Exclusiveos: linux
 #Right now dyninst does not know about the following architectures
 ExcludeArch: s390 s390x %{arm}
@@ -137,6 +137,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Mon Oct 29 2012 Josh Stone <jistone@redhat.com> 7.99.2-0.28
+- Bump to 7.99.2 per abi-compliance-checker results
+
 * Fri Oct 26 2012 Josh Stone <jistone@redhat.com> 7.99.1-0.27
 - Rebase to git dd8f40b7b4742ad97098613876efeef46d3d9e65
 - Use _smp_mflags to enable building in parallel.
