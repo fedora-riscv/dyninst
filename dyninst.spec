@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 0.28%{?dist}
+Release: 0.29%{?dist}
 URL: http://www.dyninst.org
 Version: 7.99.2
 Exclusiveos: linux
@@ -12,12 +12,12 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ dd8f40b7b4742ad97098613876efeef46d3d9e65 > dyninst-7.99.1.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ e99d7070bbc39c76d6d528db530046c22681c17e > dyninst-7.99.2.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
-#  git archive --format=tar.gz 6077804c447a8940624ea1db9d8f4d6bc7ac603e > dyninst-docs-7.99.1.tar.gz
+#  git archive --format=tar.gz 7c891b533dadd7c253940c3b460bb64e3cf78979 > dyninst-docs-7.99.2.tar.gz
 # Verify the commit ids with:
-#  gunzip -c dyninst-7.99.1.tar.gz | git get-tar-commit-id
-#  gunzip -c dyninst-docs-7.99.1.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-7.99.2.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-docs-7.99.2.tar.gz | git get-tar-commit-id
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
 # Change version number so official dyninst 8.0 will replace it
@@ -137,6 +137,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Fri Nov 09 2012 Josh Stone <jistone@redhat.com> 7.99.2-0.29
+- Rebase to git e99d7070bbc39c76d6d528db530046c22681c17e
+
 * Mon Oct 29 2012 Josh Stone <jistone@redhat.com> 7.99.2-0.28
 - Bump to 7.99.2 per abi-compliance-checker results
 
