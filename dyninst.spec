@@ -71,20 +71,13 @@ popd
 
 cd dyninst
 
-%configure
-make %{?_smp_mflags} \
-  DONT_BUILD_NEWTESTSUITE=1 \
-  all StackwalkerAPI
+%configure --disable-testsuite --includedir=%{_includedir}/dyninst --libdir=%{_libdir}/dyninst
+make %{?_smp_mflags} VERBOSE_COMPILATION=1
 
 %install
 
 cd dyninst
-make \
-  LIBRARY_DEST=%{buildroot}/%{_libdir}/dyninst \
-  PROGRAM_DEST=%{buildroot}/usr/bin \
-  INCLUDE_DEST=%{buildroot}/usr/include/dyninst \
-  DONT_BUILD_NEWTESTSUITE=1 \
-  install
+make DESTDIR=%{buildroot} install
 
 mkdir -p %{buildroot}/etc/ld.so.conf.d
 echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
@@ -131,6 +124,13 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Tue Nov 20 2012 Josh Stone <jistone@redhat.com>
+- Tweak the configure/make commands
+- Disable the testsuite via configure.
+- Set the private includedir and libdir via configure.
+- Set VERBOSE_COMPILATION for make.
+- Use DESTDIR for make install.
+
 * Mon Nov 19 2012 Josh Stone <jistone@redhat.com> 8.0-1
 - Update to release 8.0.
 - Updated "%files doc" to reflect renames.
