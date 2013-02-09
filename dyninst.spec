@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 8.0
 Exclusiveos: linux
@@ -124,6 +124,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Sat Feb 09 2013 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 8.0-2
+- Rebuild for Boost-1.53.0
+
 * Tue Nov 20 2012 Josh Stone <jistone@redhat.com>
 - Tweak the configure/make commands
 - Disable the testsuite via configure.
