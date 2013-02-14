@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 1%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 8.0
 Exclusiveos: linux
@@ -20,6 +20,7 @@ ExcludeArch: s390 s390x %{arm}
 #  gunzip -c dyninst-docs-8.0.tar.gz | git get-tar-commit-id
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
+Patch1: dyninst-rpm-build-flags.patch
 Patch5: dyninst-unused_vars.patch
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
@@ -64,6 +65,7 @@ the dyninst user-space libraries and interfaces.
 %setup -q -T -D -a 1
 
 pushd dyninst
+%patch1 -p1 -b .buildflags
 %patch5 -p1 -b .unused
 popd
 
@@ -124,6 +126,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %{_libdir}/dyninst/*.a
 
 %changelog
+* Thu Feb 14 2013 Josh Stone <jistone@redhat.com> 8.0-4
+- Patch make.config to ensure rpm build flags are not discarded.
+
 * Tue Nov 20 2012 Josh Stone <jistone@redhat.com>
 - Tweak the configure/make commands
 - Disable the testsuite via configure.
