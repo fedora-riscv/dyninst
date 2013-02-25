@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://www.dyninst.org
 Version: 8.0
 Exclusiveos: linux
@@ -21,10 +21,22 @@ ExcludeArch: s390 s390x %{arm}
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
 Patch1: dyninst-rpm-build-flags.patch
+Patch2: dyninst-install-testsuite.patch
+Patch3: dyninst-test2_4-kill-init.patch
 Patch5: dyninst-unused_vars.patch
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
+
+# Extra requires just for the testsuite
+BuildRequires: gcc-gfortran glibc-static libstdc++-static nasm
+
+# Testsuite files should not provide/require anything
+%{?filter_setup:
+%filter_provides_in %{_libdir}/dyninst/testsuite/
+%filter_requires_in %{_libdir}/dyninst/testsuite/
+%filter_setup
+}
 
 %description
 
@@ -55,10 +67,18 @@ that uses Dyninst.
 %package static
 Summary: Static libraries for the compiling programs with Dyninst
 Group: Development/System
-Requires: dyninst = %{version}-%{release}
+Requires: dyninst-devel = %{version}-%{release}
 %description static
 dyninst-static includes the static versions of the library files for
 the dyninst user-space libraries and interfaces.
+
+%package testsuite
+Summary: Programs for testing Dyninst
+Group: Development/System
+Requires: dyninst = %{version}-%{release}
+%description testsuite
+dyninst-testsuite includes the test harness and target programs for
+making sure that dyninst works properly.
 
 %prep
 %setup -q -n %{name}-%{version} -c
@@ -66,6 +86,8 @@ the dyninst user-space libraries and interfaces.
 
 pushd dyninst
 %patch1 -p1 -b .buildflags
+%patch2 -p1 -b .testsuite
+%patch3 -p1 -b .kill-init
 %patch5 -p1 -b .unused
 popd
 
@@ -73,7 +95,7 @@ popd
 
 cd dyninst
 
-%configure --disable-testsuite --includedir=%{_includedir}/dyninst --libdir=%{_libdir}/dyninst
+%configure --includedir=%{_includedir}/dyninst --libdir=%{_libdir}/dyninst
 make %{?_smp_mflags} VERBOSE_COMPILATION=1
 
 %install
@@ -88,14 +110,17 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 chmod 644 %{buildroot}%{_includedir}/dyninst/*
 chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 
+# Uglier hack to mask testsuite files from debuginfo extraction.  Running the
+# testsuite requires debuginfo, so extraction is useless.  However, debuginfo
+# extraction is still nice for the main libraries, so we don't want to disable
+# it package-wide.  The permissions are restored by attr(755,-,-) in files.
+chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
+
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root,-)
-
-# FIXME parseThat is not part of normal build
-#%{_bindir}/parseThat
 
 %dir %{_libdir}/dyninst
 %{_libdir}/dyninst/*.so.*
@@ -125,7 +150,19 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
 %defattr(-,root,root,-)
 %{_libdir}/dyninst/*.a
 
+%files testsuite
+%defattr(-,root,root,-)
+%{_bindir}/parseThat
+%dir %{_libdir}/dyninst/testsuite/
+# Restore the permissions that were hacked out above, during install.
+%attr(755,-,-) %{_libdir}/dyninst/testsuite/*
+
 %changelog
+* Mon Feb 25 2013 Josh Stone <jistone@redhat.com> 8.0-5
+- Add a dyninst-testsuite package.
+- Patch test2_4 to protect against running as root.
+- Make dyninst-static require dyninst-devel.
+
 * Thu Feb 14 2013 Josh Stone <jistone@redhat.com> 8.0-4
 - Patch make.config to ensure rpm build flags are not discarded.
 
