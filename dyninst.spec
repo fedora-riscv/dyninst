@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://www.dyninst.org
 Version: 8.0
 Exclusiveos: linux
@@ -75,7 +75,7 @@ the dyninst user-space libraries and interfaces.
 %package testsuite
 Summary: Programs for testing Dyninst
 Group: Development/System
-Requires: dyninst = %{version}-%{release}
+Requires: dyninst-devel = %{version}-%{release}
 %description testsuite
 dyninst-testsuite includes the test harness and target programs for
 making sure that dyninst works properly.
@@ -158,6 +158,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,-,-) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Tue Feb 26 2013 Josh Stone <jistone@redhat.com> 8.0-7
+- testsuite: Require dyninst-devel for the libdyninstAPI_RT.so symlink
+
 * Tue Feb 26 2013 Josh Stone <jistone@redhat.com> 8.0-6
 - Fix the testsuite path to include libtestlaunch.so
 
