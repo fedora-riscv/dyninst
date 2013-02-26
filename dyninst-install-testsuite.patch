@@ -1,6 +1,6 @@
-commit 9987bb065a6949fa6a61982b90b102052a0b71a0
+commit d16d2ecb99b3b32f8d7319fec02754a2b9fc4a5b
 Author: Josh Stone <jistone@redhat.com>
-Date:   Mon Feb 25 12:28:59 2013 -0800
+Date:   Tue Feb 26 09:34:52 2013 -0800
 
     Hack the testsuite into shape for installation
     
@@ -42,7 +42,7 @@ index 6226a35..1dd1e08 100644
                 config.C \
                 ipc.C \
 diff --git a/testsuite/make.module.tmpl b/testsuite/make.module.tmpl
-index fc03503..21d8da8 100644
+index fc03503..38393e0 100644
 --- a/testsuite/make.module.tmpl
 +++ b/testsuite/make.module.tmpl
 @@ -225,7 +225,7 @@ proccontrol_COMPONENT_LIB = $(LIBPROCCONTROLCOMP)
@@ -62,11 +62,11 @@ index fc03503..21d8da8 100644
 -LIBTESTSUITE_DEST               = $(addprefix $(TEST_DEST)/,$(LIBTESTSUITE))
 +TEST_DEST ?= $(LIBRARY_DEST)/testsuite
 +
-+ALL_TARGETS	 = $(LIBTESTSUITE) $(TESTLIBS)
++ALL_TARGETS	 = $(LIBTESTLAUNCH) $(LIBTESTSUITE) $(TESTLIBS)
 +ALL_TARGETS	+= $(MUTATORS) $(MUTATEES_MINIMUM)
 +ALL_TARGETS	+= $(DRIVERS) $(OUTPUT_DRIVERS) $(COMPONENTS)
 +
-+FULL_TARGETS	 = $(LIBTESTSUITE) $(TESTLIBS)
++FULL_TARGETS	 = $(LIBTESTLAUNCH) $(LIBTESTSUITE) $(TESTLIBS)
 +FULL_TARGETS	+= $(MUTATORS) $(MUTATEES)
 +FULL_TARGETS	+= $(DRIVERS) $(OUTPUT_DRIVERS) $(COMPONENTS)
 +

@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://www.dyninst.org
 Version: 8.0
 Exclusiveos: linux
@@ -158,6 +158,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,-,-) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Tue Feb 26 2013 Josh Stone <jistone@redhat.com> 8.0-6
+- Fix the testsuite path to include libtestlaunch.so
+
 * Mon Feb 25 2013 Josh Stone <jistone@redhat.com> 8.0-5
 - Add a dyninst-testsuite package.
 - Patch test2_4 to protect against running as root.
