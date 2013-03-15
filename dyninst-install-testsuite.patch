@@ -1,51 +1,20 @@
-commit d16d2ecb99b3b32f8d7319fec02754a2b9fc4a5b
+commit 701eb936767886bfd7b8858e8e2151173f9dc6bd
 Author: Josh Stone <jistone@redhat.com>
 Date:   Tue Feb 26 09:34:52 2013 -0800
 
     Hack the testsuite into shape for installation
     
-    * make.components: Fix a findstring call which block parseThat.
-    * parseThat/Makefile.in: Respect DESTDIR.
     * testsuite/make.module.tmpl: Forgo rpath, and install all targets.
     * testsuite/src/runTests-utils.C (setupVars): Don't complain about the
       scripts dir, as it's not actually needed anyway.
-    * testsuite/src/test_driver.C(updateSearchPaths): fix a strcat->strcpy.
-      (getRTLibDir): Hack out the builddir path, and just use ../
-    * testsuite/src/dyninst/test1_18F_fortran.F: Backport a fix from master.
+    * testsuite/src/test_driver.C (getRTLibDir): Hack out the builddir path,
+      and just use ../ (aka %{libdir}/dyninst/testsuite/../)
 
-diff --git a/make.components b/make.components
-index 159a44a..17f41c5 100644
---- a/make.components
-+++ b/make.components
-@@ -86,7 +86,7 @@ endif # StackwalkerAPI
- endif # SymtabAPI
- endif # default
- 
--ifeq (findstring(dyninstAPI,$(fullSystem)),dyninstAPI)
-+ifeq ($(findstring dyninstAPI,$(fullSystem)),dyninstAPI)
- BUILD_PARSETHAT ?= true
- endif
- 
-diff --git a/parseThat/Makefile.in b/parseThat/Makefile.in
-index 6226a35..1dd1e08 100644
---- a/parseThat/Makefile.in
-+++ b/parseThat/Makefile.in
-@@ -23,6 +23,10 @@ vpath % @srcdir@/src
- # -------------------------------------------
- .PHONY: clean ready
- 
-+ifdef DESTDIR
-+prefix := $(DESTDIR)$(prefix)
-+endif
-+
- SRCS         = parseThat.C \
-                config.C \
-                ipc.C \
 diff --git a/testsuite/make.module.tmpl b/testsuite/make.module.tmpl
-index fc03503..38393e0 100644
+index 1d3ce2c..1c76d8f 100644
 --- a/testsuite/make.module.tmpl
 +++ b/testsuite/make.module.tmpl
-@@ -225,7 +225,7 @@ proccontrol_COMPONENT_LIB = $(LIBPROCCONTROLCOMP)
+@@ -227,7 +227,7 @@ proccontrol_COMPONENT_LIB = $(LIBPROCCONTROLCOMP)
  SPACE :=
  SPACE +=
  #COMPONENT_LDFLAGS += $(subst $(SPACE),,-Wl,--enable-new-dtags$(ALL_COMP_DIRS:%=,-rpath,%))
@@ -54,7 +23,7 @@ index fc03503..38393e0 100644
  
  all: default
  
-@@ -244,8 +244,19 @@ full: test-full
+@@ -246,8 +246,19 @@ full: test-full
  ###  A list of all the targets we're building, for install purposes
  #######################################################################
  
@@ -76,7 +45,7 @@ index fc03503..38393e0 100644
  
  #######################################################################
  ###  Some pattern rules
-@@ -272,13 +283,11 @@ include make.mutators.gen
+@@ -274,13 +285,11 @@ include make.mutators.gen
  
  include make.solo_mutatee.gen
  
@@ -95,7 +64,7 @@ index fc03503..38393e0 100644
  
  #######################################################################
  ###  Filter results, if needed
-@@ -294,13 +303,13 @@ include $(TO_CORE)/make.components
+@@ -296,13 +305,13 @@ include $(TO_CORE)/make.components
  
  ifneq ($(wildcard ../src/dyninst), )
  ifneq ($(findstring dyninstAPI,$(fullSystem)),)
@@ -115,7 +84,7 @@ index fc03503..38393e0 100644
  dyninst_targs = $(DYNINST_TESTLIBS_ABI) $(DYNINST_STATIC_TESTLIBS_ABI)
  endif
  dyninst_targs += $(filter-out $(BUILD_FILTER), $(filter-out $(MINIMUM_BUILD_FILTER), $(dyninst_SOLO_MUTATEES)))
-@@ -310,11 +319,11 @@ endif
+@@ -312,11 +321,11 @@ endif
  
  ifneq ($(wildcard ../src/symtab), )
  ifneq ($(findstring symtabAPI,$(fullSystem)),)
@@ -132,7 +101,7 @@ index fc03503..38393e0 100644
  symtab_targs = $(filter-out $(BUILD_FILTER), $(filter-out $(MINIMUM_BUILD_FILTER), $(symtab_SOLO_MUTATEES)))
  symtab_targs = $(symtab_MUTATORS_SO) $(LIBSYMTABCOMP)
  endif
-@@ -322,12 +331,12 @@ endif
+@@ -324,12 +333,12 @@ endif
  
  ifneq ($(wildcard ../src/instruction), )
  ifneq ($(findstring instructionAPI,$(fullSystem)),)
@@ -150,7 +119,7 @@ index fc03503..38393e0 100644
  instruction_targs = $(LIBINSTRUCTIONCOMP)
  endif
  instruction_targs += $(filter-out $(BUILD_FILTER), $(filter-out $(MINIMUM_BUILD_FILTER), $(instruction_SOLO_MUTATEES)))
-@@ -337,12 +346,12 @@ endif
+@@ -339,12 +348,12 @@ endif
  
  ifneq ($(wildcard ../src/proccontrol), )
  ifneq ($(findstring proccontrol,$(fullSystem)),)
@@ -168,7 +137,7 @@ index fc03503..38393e0 100644
  proccontrol_targs = $(LIBPROCCONTROLCOMP) $(PROCCONTROL_TESTLIBS) $(PROCCONTROL_TESTLIBS_ABI) $(DYNINST_TESTLIBS) $(DYNINST_TESTLIBS_ABI)
  endif
  proccontrol_targs += $(filter-out $(BUILD_FILTER), $(filter-out $(MINIMUM_BUILD_FILTER), $(proccontrol_SOLO_MUTATEES)))
-@@ -350,6 +359,16 @@ proccontrol_targs += $(proccontrol_MUTATORS_SO)
+@@ -352,6 +361,16 @@ proccontrol_targs += $(proccontrol_MUTATORS_SO)
  endif
  endif
  
@@ -185,7 +154,7 @@ index fc03503..38393e0 100644
  common_infra: drivers output_drivers
  
  dyninstAPI: common_infra $(dyninst_targs) $(symtab_targs) $(instruction_targs) $(proccontrol_targs)
-@@ -360,7 +379,13 @@ instructionAPI: common_infra $(instruction_targs)
+@@ -362,7 +381,13 @@ instructionAPI: common_infra $(instruction_targs)
  
  proccontrol: common_infra $(proccontrol_targs)
  
@@ -200,7 +169,7 @@ index fc03503..38393e0 100644
  
  symlink: all
  
-@@ -409,7 +434,8 @@ endif
+@@ -412,7 +437,8 @@ endif
  
  testlibs: $(LIBTESTSUITE)
  
@@ -210,7 +179,7 @@ index fc03503..38393e0 100644
  
  .PHONY: clean install distclean mutators mutatees testlibs gnu_mutatees native_mutatees echo all
  
-@@ -563,7 +589,8 @@ endif
+@@ -566,7 +592,8 @@ endif
  
  # Install directory
  $(TEST_DEST): 
@@ -220,26 +189,13 @@ index fc03503..38393e0 100644
  
  #######################################################################
  ###  Generic Mutator build rule:
-@@ -841,3 +868,6 @@ endif
+@@ -857,3 +884,6 @@ endif
  endif
  endif
  endif
 +
 +install: $(ALL_TARGETS_DEST)
 +install-full: $(FULL_TARGETS_DEST)
-diff --git a/testsuite/src/dyninst/test1_18F_fortran.F b/testsuite/src/dyninst/test1_18F_fortran.F
-index a33241b..9863fef 100644
---- a/testsuite/src/dyninst/test1_18F_fortran.F
-+++ b/testsuite/src/dyninst/test1_18F_fortran.F
-@@ -47,8 +47,6 @@
- #define AND and
- #define OR or
- #endif
--	DATA test1_18_globalVariable1/42/
--	END
- !------------------------------------------------------------------------------
- 
- 	SUBROUTINE test1_18f_init_globals
 diff --git a/testsuite/src/runTests-utils.C b/testsuite/src/runTests-utils.C
 index 0f54874..02bd505 100644
 --- a/testsuite/src/runTests-utils.C
@@ -260,18 +216,9 @@ index 0f54874..02bd505 100644
     // Determine Test log dir
     char *pdtst = getenv("PDTST");
 diff --git a/testsuite/src/test_driver.C b/testsuite/src/test_driver.C
-index 02eec1a..31def33 100644
+index 0fc3117..31def33 100644
 --- a/testsuite/src/test_driver.C
 +++ b/testsuite/src/test_driver.C
-@@ -755,7 +755,7 @@ void updateSearchPaths(const char *filename) {
-       // Add current directory to the search path
-       const char *pathenv = getenv("PATH");
-       char *newpath = (char *) malloc (strlen(pathenv)+3);
--      strcat(newpath, pathenv);
-+      strcpy(newpath, pathenv);
-       strcat(newpath, ":.");
-       execpath = searchPath(newpath, filename);
-       if(execpath == NULL) {
 @@ -805,6 +805,8 @@ void updateSearchPaths(const char *filename) {
  }
  

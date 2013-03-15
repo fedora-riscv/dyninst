@@ -2,9 +2,9 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 7%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 8.0
+Version: 8.1.1
 Exclusiveos: linux
 #Right now dyninst does not know about the following architectures
 ExcludeArch: s390 s390x %{arm}
@@ -12,18 +12,17 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ v8.0 > dyninst-8.0.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ v8.1.1 > dyninst-8.1.1.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
-#  git archive --format=tar.gz v8.0 > dyninst-docs-8.0.tar.gz
+#  git archive --format=tar.gz v8.1.1 > dyninst-docs-8.1.1.tar.gz
 # Verify the commit ids with:
-#  gunzip -c dyninst-8.0.tar.gz | git get-tar-commit-id
-#  gunzip -c dyninst-docs-8.0.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-8.1.1.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-docs-8.1.1.tar.gz | git get-tar-commit-id
 Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-%{version}.tar.gz
 Patch1: dyninst-rpm-build-flags.patch
 Patch2: dyninst-install-testsuite.patch
-Patch3: dyninst-test2_4-kill-init.patch
-Patch5: dyninst-unused_vars.patch
+Patch3: dyninst-relative-symlinks.patch
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -87,8 +86,7 @@ making sure that dyninst works properly.
 pushd dyninst
 %patch1 -p1 -b .buildflags
 %patch2 -p1 -b .testsuite
-%patch3 -p1 -b .kill-init
-%patch5 -p1 -b .unused
+%patch3 -p1 -b .symlinks
 popd
 
 %build
@@ -138,7 +136,7 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %doc ParseAPI.pdf
 %doc PatchAPI.pdf
 %doc ProcControlAPI.pdf
-%doc stackwalk/stackwalker.pdf
+%doc StackwalkerAPI.pdf
 %doc SymtabAPI.pdf
 
 %files devel
@@ -155,9 +153,16 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %{_bindir}/parseThat
 %dir %{_libdir}/dyninst/testsuite/
 # Restore the permissions that were hacked out above, during install.
-%attr(755,-,-) %{_libdir}/dyninst/testsuite/*
+%attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Fri Mar 15 2013 Josh Stone <jistone@redhat.com> 8.1.1-1
+- Update to release 8.1.1.
+- Drop the backported dyninst-test2_4-kill-init.patch.
+- Drop the now-upstreamed dyninst-unused_vars.patch.
+- Update other patches for context.
+- Patch the installed symlinks to be relative, not $(DEST) filled.
+
 * Tue Feb 26 2013 Josh Stone <jistone@redhat.com> 8.0-7
 - testsuite: Require dyninst-devel for the libdyninstAPI_RT.so symlink
 
