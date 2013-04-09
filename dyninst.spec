@@ -261,7 +261,7 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 * Fri May 11 2012 William Cohen <wcohen@redhat.com> - 7.0.1-0.9
 - Clean up Makefile rules.
 
-* Wed May 5 2012 William Cohen <wcohen@redhat.com> - 7.0.1-0.8
+* Sat May 5 2012 William Cohen <wcohen@redhat.com> - 7.0.1-0.8
 - Clean up spec file.
 
 * Wed May 2 2012 William Cohen <wcohen@redhat.com> - 7.0.1-0.7
