@@ -4,7 +4,7 @@ Name: dyninst
 Group: Development/Libraries
 Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 8.1.1
+Version: 8.1.2
 Exclusiveos: linux
 #Right now dyninst does not know about the following architectures
 ExcludeArch: s390 s390x %{arm}
@@ -12,17 +12,16 @@ ExcludeArch: s390 s390x %{arm}
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ v8.1.1 > dyninst-8.1.1.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ v8.1.2 > dyninst-8.1.2.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
 #  git archive --format=tar.gz v8.1.1 > dyninst-docs-8.1.1.tar.gz
 # Verify the commit ids with:
-#  gunzip -c dyninst-8.1.1.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-8.1.2.tar.gz | git get-tar-commit-id
 #  gunzip -c dyninst-docs-8.1.1.tar.gz | git get-tar-commit-id
 Source0: %{name}-%{version}.tar.gz
-Source1: %{name}-docs-%{version}.tar.gz
+Source1: %{name}-docs-8.1.1.tar.gz
 Patch1: dyninst-rpm-build-flags.patch
 Patch2: dyninst-install-testsuite.patch
-Patch3: dyninst-relative-symlinks.patch
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -86,7 +85,6 @@ making sure that dyninst works properly.
 pushd dyninst
 %patch1 -p1 -b .buildflags
 %patch2 -p1 -b .testsuite
-%patch3 -p1 -b .symlinks
 popd
 
 %build
@@ -156,6 +154,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Tue Jun 18 2013 Josh Stone <jistone@redhat.com> 8.1.2-1
+- Update to release 8.1.2.
+
 * Fri Mar 15 2013 Josh Stone <jistone@redhat.com> 8.1.1-1
 - Update to release 8.1.1.
 - Drop the backported dyninst-test2_4-kill-init.patch.
