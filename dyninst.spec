@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 8.1.2
 Exclusiveos: linux
@@ -154,6 +154,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Tue Jul 30 2013 Petr Machata <pmachata@redhat.com> - 8.1.2-2
+- Rebuild for boost 1.54.0
+
 * Tue Jun 18 2013 Josh Stone <jistone@redhat.com> 8.1.2-1
 - Update to release 8.1.2.
 
