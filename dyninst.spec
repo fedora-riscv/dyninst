@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 8.1.2
 Exclusiveos: linux
@@ -22,6 +22,7 @@ Source0: %{name}-%{version}.tar.gz
 Source1: %{name}-docs-8.1.1.tar.gz
 Patch1: dyninst-rpm-build-flags.patch
 Patch2: dyninst-install-testsuite.patch
+Patch3: dyninst-pokeuser.patch
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -85,7 +86,9 @@ making sure that dyninst works properly.
 pushd dyninst
 %patch1 -p1 -b .buildflags
 %patch2 -p1 -b .testsuite
+%patch3 -p1 -b .pokeuser
 popd
+
 
 %build
 
@@ -154,6 +157,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Mon Aug 05 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.1.2-4
+- Fix rhbz991889 (FTBFS).
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.1.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
