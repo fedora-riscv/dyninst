@@ -28,7 +28,10 @@ BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
 
 # Extra requires just for the testsuite
-BuildRequires: gcc-gfortran glibc-static libstdc++-static nasm
+BuildRequires: gcc-gfortran glibc-static nasm
+%if 0%{?fedora}
+BuildRequires: libstdc++-static
+%endif
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
