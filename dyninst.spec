@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://www.dyninst.org
 Version: 8.1.2
 Exclusiveos: linux
@@ -23,6 +23,7 @@ Source1: %{name}-docs-8.1.1.tar.gz
 Patch1: dyninst-rpm-build-flags.patch
 Patch2: dyninst-install-testsuite.patch
 Patch3: dyninst-pokeuser.patch
+Patch4: dyninst-Werror-format-security.patch
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -87,6 +88,7 @@ pushd dyninst
 %patch1 -p1 -b .buildflags
 %patch2 -p1 -b .testsuite
 %patch3 -p1 -b .pokeuser
+%patch4 -p1 -d testsuite -b .format-security
 popd
 
 
@@ -157,6 +159,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Tue Dec 03 2013 Josh Stone <jistone@redhat.com> 8.1.2-5
+- Fix rhbz1037048 (-Werror=format-security FTBFS)
+
 * Mon Aug 05 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.1.2-4
 - Fix rhbz991889 (FTBFS).
 
