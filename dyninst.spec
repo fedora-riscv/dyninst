@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://www.dyninst.org
 Version: 8.1.2
 Exclusiveos: linux
@@ -24,6 +24,7 @@ Patch1: dyninst-rpm-build-flags.patch
 Patch2: dyninst-install-testsuite.patch
 Patch3: dyninst-pokeuser.patch
 Patch4: dyninst-Werror-format-security.patch
+Patch5: dyninst-8.1.2-testsuite-opt.patch
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -89,6 +90,7 @@ pushd dyninst
 %patch2 -p1 -b .testsuite
 %patch3 -p1 -b .pokeuser
 %patch4 -p1 -d testsuite -b .format-security
+%patch5 -p1 -b .testsuite-opt
 popd
 
 
@@ -159,6 +161,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Wed Dec 11 2013 Josh Stone <jistone@redhat.com> 8.1.2-6
+- Fix rhbz1040715 (testsuite g++ optimization)
+
 * Tue Dec 03 2013 Josh Stone <jistone@redhat.com> 8.1.2-5
 - Fix rhbz1037048 (-Werror=format-security FTBFS)
 
