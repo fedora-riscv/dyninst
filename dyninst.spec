@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://www.dyninst.org
 Version: 8.1.2
 Exclusiveos: linux
@@ -161,6 +161,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Thu May 22 2014 Josh Stone <jistone@redhat.com> - 8.1.2-7
+- Rebuild for libdwarf.so.1
+
 * Wed Dec 11 2013 Josh Stone <jistone@redhat.com> 8.1.2-6
 - Fix rhbz1040715 (testsuite g++ optimization)
 
