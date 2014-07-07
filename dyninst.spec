@@ -2,12 +2,12 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://www.dyninst.org
 Version: 8.1.2
 Exclusiveos: linux
-#Right now dyninst does not know about the following architectures
-ExcludeArch: s390 s390x %{arm}
+#dyninst only knows the following architectures
+ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
@@ -161,6 +161,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Mon Jul 07 2014 Josh Stone <jistone@redhat.com> - 8.1.2-10
+- Flip from ExcludeArch to ExclusiveArch (ref rhbz1113991)
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.1.2-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
