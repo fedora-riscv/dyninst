@@ -2,9 +2,9 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 11%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 8.1.2
+Version: 8.2.0
 Exclusiveos: linux
 #dyninst only knows the following architectures
 ExclusiveArch: %{ix86} x86_64 ppc ppc64
@@ -12,22 +12,23 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ v8.1.2 > dyninst-8.1.2.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ v8.2.0.1 > dyninst-8.2.0.1.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
-#  git archive --format=tar.gz v8.1.1 > dyninst-docs-8.1.1.tar.gz
+#  git archive --format=tar.gz --prefix=docs/ v8.2.0.1 > dyninst-docs-8.2.0.1.tar.gz
+#  git clone http://git.dyninst.org/testsuite.git; cd testsuite
+#  git archive --format=tar.gz --prefix=testsuite/ v8.2.0.1 > dyninst-testsuite-8.2.0.1.tar.gz
 # Verify the commit ids with:
-#  gunzip -c dyninst-8.1.2.tar.gz | git get-tar-commit-id
-#  gunzip -c dyninst-docs-8.1.1.tar.gz | git get-tar-commit-id
-Source0: %{name}-%{version}.tar.gz
-Source1: %{name}-docs-8.1.1.tar.gz
-Patch1: dyninst-rpm-build-flags.patch
-Patch2: dyninst-install-testsuite.patch
-Patch3: dyninst-pokeuser.patch
-Patch4: dyninst-Werror-format-security.patch
-Patch5: dyninst-8.1.2-testsuite-opt.patch
+#  gunzip -c dyninst-8.2.0.1.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-docs-8.2.0.1.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-testsuite-8.2.0.1.tar.gz | git get-tar-commit-id
+Source0: dyninst-%{version}.1.tar.gz
+Source1: dyninst-docs-%{version}.1.tar.gz
+Source2: dyninst-testsuite-%{version}.1.tar.gz
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
+BuildRequires: binutils-devel
+BuildRequires: cmake
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran glibc-static libstdc++-static nasm
@@ -60,6 +61,7 @@ Summary: Header files for the compiling programs with Dyninst
 Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: boost-devel
+
 %description devel
 dyninst-devel includes the C header files that specify the Dyninst user-space
 libraries and interfaces. This is required for rebuilding any program
@@ -76,7 +78,10 @@ the dyninst user-space libraries and interfaces.
 %package testsuite
 Summary: Programs for testing Dyninst
 Group: Development/System
+Requires: dyninst = %{version}-%{release}
 Requires: dyninst-devel = %{version}-%{release}
+Requires: dyninst-static = %{version}-%{release}
+Requires: glibc-static
 %description testsuite
 dyninst-testsuite includes the test harness and target programs for
 making sure that dyninst works properly.
@@ -84,26 +89,38 @@ making sure that dyninst works properly.
 %prep
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
-
-pushd dyninst
-%patch1 -p1 -b .buildflags
-%patch2 -p1 -b .testsuite
-%patch3 -p1 -b .pokeuser
-%patch4 -p1 -d testsuite -b .format-security
-%patch5 -p1 -b .testsuite-opt
-popd
-
+%setup -q -T -D -a 2
 
 %build
 
 cd dyninst
 
-%configure --includedir=%{_includedir}/dyninst --libdir=%{_libdir}/dyninst
-make %{?_smp_mflags} VERBOSE_COMPILATION=1
+%cmake \
+ -DINSTALL_LIB_DIR:PATH=%{_libdir}/dyninst \
+ -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
+ -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
+ -DCMAKE_SKIP_RPATH:BOOL=YES
+make %{?_smp_mflags}
+
+# Hack to install dyninst nearby, so the testsuite can use it
+make DESTDIR=../install install
+sed -i -e 's!%{_libdir}/dyninst!../install%{_libdir}/dyninst!' \
+  ../install%{_libdir}/cmake/Dyninst/*.cmake
+
+cd ../testsuite
+%cmake \
+ -DDyninst_DIR:PATH=../install%{_libdir}/cmake/Dyninst \
+ -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
+ -DCMAKE_BUILD_TYPE:STRING=Debug \
+ -DCMAKE_SKIP_RPATH:BOOL=YES
+make %{?_smp_mflags}
 
 %install
 
 cd dyninst
+make DESTDIR=%{buildroot} install
+
+cd ../testsuite
 make DESTDIR=%{buildroot} install
 
 mkdir -p %{buildroot}/etc/ld.so.conf.d
@@ -135,19 +152,22 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 
 %files doc
 %defattr(-,root,root,-)
-%doc dynC_API.pdf
-%doc DyninstAPI.pdf
-%doc InstructionAPI.pdf
-%doc ParseAPI.pdf
-%doc PatchAPI.pdf
-%doc ProcControlAPI.pdf
-%doc StackwalkerAPI.pdf
-%doc SymtabAPI.pdf
+%doc docs/dynC_API.pdf
+%doc docs/DyninstAPI.pdf
+%doc docs/dyninstAPI/examples/
+%doc docs/InstructionAPI.pdf
+%doc docs/ParseAPI.pdf
+%doc docs/PatchAPI.pdf
+%doc docs/ProcControlAPI.pdf
+%doc docs/StackwalkerAPI.pdf
+%doc docs/SymtabAPI.pdf
 
 %files devel
 %defattr(-,root,root,-)
 %{_includedir}/dyninst
 %{_libdir}/dyninst/*.so
+%dir %{_libdir}/cmake
+%{_libdir}/cmake/Dyninst
 
 %files static
 %defattr(-,root,root,-)
@@ -155,12 +175,15 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 
 %files testsuite
 %defattr(-,root,root,-)
-%{_bindir}/parseThat
+#%{_bindir}/parseThat
 %dir %{_libdir}/dyninst/testsuite/
 # Restore the permissions that were hacked out above, during install.
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Wed Aug 20 2014 Josh Stone <jistone@redhat.com> - 8.2.0-1
+- rebase to 8.2.0, using upstream tag "v8.2.0.1"
+
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.1.2-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
