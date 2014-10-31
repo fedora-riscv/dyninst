@@ -4,7 +4,7 @@ Name: dyninst
 Group: Development/Libraries
 Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 8.2.0
+Version: 8.2.1
 Exclusiveos: linux
 #dyninst only knows the following architectures
 ExclusiveArch: %{ix86} x86_64 ppc ppc64
@@ -12,18 +12,18 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ v8.2.0.1 > dyninst-8.2.0.1.tar.gz
+#  git archive --format=tar.gz --prefix=dyninst/ v8.2.1 > dyninst-8.2.1.tar.gz
 #  git clone http://git.dyninst.org/docs.git; cd docs
 #  git archive --format=tar.gz --prefix=docs/ v8.2.0.1 > dyninst-docs-8.2.0.1.tar.gz
 #  git clone http://git.dyninst.org/testsuite.git; cd testsuite
 #  git archive --format=tar.gz --prefix=testsuite/ v8.2.0.1 > dyninst-testsuite-8.2.0.1.tar.gz
 # Verify the commit ids with:
-#  gunzip -c dyninst-8.2.0.1.tar.gz | git get-tar-commit-id
+#  gunzip -c dyninst-8.2.1.tar.gz | git get-tar-commit-id
 #  gunzip -c dyninst-docs-8.2.0.1.tar.gz | git get-tar-commit-id
 #  gunzip -c dyninst-testsuite-8.2.0.1.tar.gz | git get-tar-commit-id
-Source0: dyninst-%{version}.1.tar.gz
-Source1: dyninst-docs-%{version}.1.tar.gz
-Source2: dyninst-testsuite-%{version}.1.tar.gz
+Source0: dyninst-8.2.1.tar.gz
+Source1: dyninst-docs-8.2.0.1.tar.gz
+Source2: dyninst-testsuite-8.2.0.1.tar.gz
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -181,6 +181,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Fri Oct 31 2014 Josh Stone <jistone@redhat.com> - 8.2.1-1
+- Update to point release 8.2.1.
+
 * Wed Aug 20 2014 Josh Stone <jistone@redhat.com> - 8.2.0-1
 - rebase to 8.2.0, using upstream tag "v8.2.0.1"
 
