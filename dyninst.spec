@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://www.dyninst.org
 Version: 8.2.1
 Exclusiveos: linux
@@ -181,6 +181,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Wed Jul 22 2015 David Tardon <dtardon@redhat.com> - 8.2.1-6
+- rebuild for Boost 1.58
+
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.2.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
