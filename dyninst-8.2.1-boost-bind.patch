@@ -1,0 +1,42 @@
+commit 28f52285af957fd464485cc706b4b9eba65912cf
+Author: Josh Stone <jistone@redhat.com>
+Date:   Thu Jul 23 15:28:56 2015 -0700
+
+    dataflowAPI: use boost::bind() instead of bind<void>()
+    
+    With boost 1.58, the boost::bind<void>() in Slicer::getPredecessors()
+    gave an "error: call of overloaded 'bind[...]' is ambiguous".
+    
+    Every other bind in dyninst uses plain boost::bind(), which does its own
+    inspection of return type.  That works well in this case too, even with
+    older boost versions.
+
+diff --git a/dataflowAPI/src/slicing.C b/dataflowAPI/src/slicing.C
+index 8f36d8dc3cd6..436961549a9f 100644
+--- a/dataflowAPI/src/slicing.C
++++ b/dataflowAPI/src/slicing.C
+@@ -722,15 +722,15 @@ Slicer::getPredecessors(
+     const Block::edgelist & sources = cand.loc.block->sources();
+     std::for_each(boost::make_filter_iterator(epred, sources.begin(), sources.end()),
+ 		  boost::make_filter_iterator(epred, sources.end(), sources.end()),
+-		  boost::bind<void>(&Slicer::handlePredecessorEdge,
+-				    this,
+-				    _1,
+-				    boost::ref(p),
+-				    boost::ref(cand),
+-				    boost::ref(newCands),
+-				    boost::ref(err),
+-				    boost::ref(nf)
+-				    ));
++		  boost::bind(&Slicer::handlePredecessorEdge,
++			      this,
++			      _1,
++			      boost::ref(p),
++			      boost::ref(cand),
++			      boost::ref(newCands),
++			      boost::ref(err),
++			      boost::ref(nf)
++			      ));
+    
+     return !err; 
+ }

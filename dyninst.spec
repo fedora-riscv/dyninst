@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://www.dyninst.org
 Version: 8.2.1
 Exclusiveos: linux
@@ -24,6 +24,7 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 Source0: dyninst-8.2.1.tar.gz
 Source1: dyninst-docs-8.2.0.1.tar.gz
 Source2: dyninst-testsuite-8.2.0.1.tar.gz
+Patch1: dyninst-8.2.1-boost-bind.patch
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -90,6 +91,10 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 %setup -q -T -D -a 2
+
+pushd dyninst
+%patch1 -p1 -b .bind
+popd
 
 %build
 
@@ -181,6 +186,9 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
 
 %changelog
+* Thu Jul 23 2015 Josh Stone <jistone@redhat.com> - 8.2.1-7
+- Patch use of boost::bind for boost 1.58.
+
 * Wed Jul 22 2015 David Tardon <dtardon@redhat.com> - 8.2.1-6
 - rebuild for Boost 1.58
 
