@@ -2,29 +2,19 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 9%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 8.2.1
+Version: 9.0.3
 Exclusiveos: linux
 #dyninst only knows the following architectures
 ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
-# The source for this package was pulled from upstream's vcs.  Use the
-# following commands to generate the tarball:
-#  git clone http://git.dyninst.org/dyninst.git; cd dyninst
-#  git archive --format=tar.gz --prefix=dyninst/ v8.2.1 > dyninst-8.2.1.tar.gz
-#  git clone http://git.dyninst.org/docs.git; cd docs
-#  git archive --format=tar.gz --prefix=docs/ v8.2.0.1 > dyninst-docs-8.2.0.1.tar.gz
-#  git clone http://git.dyninst.org/testsuite.git; cd testsuite
-#  git archive --format=tar.gz --prefix=testsuite/ v8.2.0.1 > dyninst-testsuite-8.2.0.1.tar.gz
-# Verify the commit ids with:
-#  gunzip -c dyninst-8.2.1.tar.gz | git get-tar-commit-id
-#  gunzip -c dyninst-docs-8.2.0.1.tar.gz | git get-tar-commit-id
-#  gunzip -c dyninst-testsuite-8.2.0.1.tar.gz | git get-tar-commit-id
-Source0: dyninst-8.2.1.tar.gz
-Source1: dyninst-docs-8.2.0.1.tar.gz
-Source2: dyninst-testsuite-8.2.0.1.tar.gz
-Patch1: dyninst-8.2.1-boost-bind.patch
+Source0: http://www.paradyn.org/release%{version}/DyninstAPI-%{version}.tgz
+Source1: http://www.paradyn.org/release%{version}/Testsuite-%{version}.tgz
+
+%global dyninst_base DyninstAPI-%{version}
+%global testsuite_base Testsuite-9.0.0
+
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -90,56 +80,54 @@ making sure that dyninst works properly.
 %prep
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
-%setup -q -T -D -a 2
-
-pushd dyninst
-%patch1 -p1 -b .bind
-popd
 
 %build
 
-cd dyninst
+cd %{dyninst_base}
 
 %cmake \
+ -DENABLE_STATIC_LIBS=1 \
  -DINSTALL_LIB_DIR:PATH=%{_libdir}/dyninst \
  -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
  -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
+ -DCMAKE_BUILD_TYPE=None \
  -DCMAKE_SKIP_RPATH:BOOL=YES
-make %{?_smp_mflags}
+%make_build
 
 # Hack to install dyninst nearby, so the testsuite can use it
 make DESTDIR=../install install
-sed -i -e 's!%{_libdir}/dyninst!../install%{_libdir}/dyninst!' \
-  ../install%{_libdir}/cmake/Dyninst/*.cmake
+find ../install -name '*.cmake' -execdir \
+  sed -i -e 's!%{_prefix}!../install&!' '{}' '+'
 
-cd ../testsuite
+cd ../%{testsuite_base}
 %cmake \
- -DDyninst_DIR:PATH=../install%{_libdir}/cmake/Dyninst \
+ -DDyninst_DIR:PATH=$PWD/../install%{_libdir}/cmake/Dyninst \
  -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
  -DCMAKE_BUILD_TYPE:STRING=Debug \
  -DCMAKE_SKIP_RPATH:BOOL=YES
-make %{?_smp_mflags}
+%make_build
 
 %install
 
-cd dyninst
-make DESTDIR=%{buildroot} install
+cd %{dyninst_base}
+%make_install
 
-cd ../testsuite
-make DESTDIR=%{buildroot} install
+# It doesn't install docs the way we want, so remove them.
+# We'll just grab the pdfs later, directly from the build dir.
+rm -v %{buildroot}%{_docdir}/*-%{version}.pdf
+
+cd ../%{testsuite_base}
+%make_install
 
 mkdir -p %{buildroot}/etc/ld.so.conf.d
 echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 
-# Ugly hack to fix permissions
-chmod 644 %{buildroot}%{_includedir}/dyninst/*
-chmod 644 %{buildroot}%{_libdir}/dyninst/*.a
-
-# Uglier hack to mask testsuite files from debuginfo extraction.  Running the
+# Ugly hack to mask testsuite files from debuginfo extraction.  Running the
 # testsuite requires debuginfo, so extraction is useless.  However, debuginfo
 # extraction is still nice for the main libraries, so we don't want to disable
 # it package-wide.  The permissions are restored by attr(755,-,-) in files.
-chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
+find %{buildroot}%{_libdir}/dyninst/testsuite/ \
+  -type f '!' -name '*.a' -execdir chmod 644 '{}' '+'
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -150,22 +138,21 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 %dir %{_libdir}/dyninst
 %{_libdir}/dyninst/*.so.*
 
-%doc dyninst/COPYRIGHT
-%doc dyninst/LGPL
+%doc %{dyninst_base}/COPYRIGHT
+%doc %{dyninst_base}/LGPL
 
 %config(noreplace) /etc/ld.so.conf.d/*
 
 %files doc
 %defattr(-,root,root,-)
-%doc docs/dynC_API.pdf
-%doc docs/DyninstAPI.pdf
-%doc docs/dyninstAPI/examples/
-%doc docs/InstructionAPI.pdf
-%doc docs/ParseAPI.pdf
-%doc docs/PatchAPI.pdf
-%doc docs/ProcControlAPI.pdf
-%doc docs/StackwalkerAPI.pdf
-%doc docs/SymtabAPI.pdf
+%doc %{dyninst_base}/dynC_API/doc/dynC_API.pdf
+%doc %{dyninst_base}/dyninstAPI/doc/dyninstAPI.pdf
+%doc %{dyninst_base}/instructionAPI/doc/instructionAPI.pdf
+%doc %{dyninst_base}/parseAPI/doc/parseAPI.pdf
+%doc %{dyninst_base}/patchAPI/doc/patchAPI.pdf
+%doc %{dyninst_base}/proccontrol/doc/proccontrol.pdf
+%doc %{dyninst_base}/stackwalk/doc/stackwalk.pdf
+%doc %{dyninst_base}/symtabAPI/doc/symtabAPI.pdf
 
 %files devel
 %defattr(-,root,root,-)
@@ -180,12 +167,16 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 
 %files testsuite
 %defattr(-,root,root,-)
-#%{_bindir}/parseThat
+#{_bindir}/parseThat
 %dir %{_libdir}/dyninst/testsuite/
 # Restore the permissions that were hacked out above, during install.
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*
+%attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Fri Sep 04 2015 Josh Stone <jistone@redhat.com> - 9.0.3-1
+- Update to 9.0.3
+
 * Thu Aug 27 2015 Jonathan Wakely <jwakely@redhat.com> - 8.2.1-9
 - Rebuilt for Boost 1.59
 
@@ -285,7 +276,7 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 
 * Mon Nov 19 2012 Josh Stone <jistone@redhat.com> 8.0-1
 - Update to release 8.0.
-- Updated "%files doc" to reflect renames.
+- Updated "files doc" to reflect renames.
 - Drop the unused BuildRequires libxml2-devel.
 - Drop the 7.99.x version-munging patch.
 
@@ -315,7 +306,7 @@ chmod 644 %{buildroot}%{_libdir}/dyninst/testsuite/*
 - Rebase on newer git tree.
 - Update license files with upstream additions.
 - Split documentation into -doc subpackage.
-- Claim ownership of %{_libdir}/dyninst.
+- Claim ownership of {_libdir}/dyninst.
 
 * Fri Jul 27 2012 William Cohen <wcohen@redhat.com> - 7.99-0.22
 - Correct requires for dyninst-devel.
