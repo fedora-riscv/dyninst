@@ -4,7 +4,7 @@ Name: dyninst
 Group: Development/Libraries
 Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 9.0.3
+Version: 9.1.0
 Exclusiveos: linux
 #dyninst only knows the following architectures
 ExclusiveArch: %{ix86} x86_64 ppc ppc64
@@ -13,7 +13,7 @@ Source0: http://www.paradyn.org/release%{version}/DyninstAPI-%{version}.tgz
 Source1: http://www.paradyn.org/release%{version}/Testsuite-%{version}.tgz
 
 %global dyninst_base DyninstAPI-%{version}
-%global testsuite_base Testsuite-9.0.0
+%global testsuite_base Testsuite-%{version}
 
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
@@ -174,6 +174,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Fri Dec 18 2015 Josh Stone <jistone@redhat.com> - 9.1.0-1
+- Update to 9.1.0
+
 * Fri Sep 04 2015 Josh Stone <jistone@redhat.com> - 9.0.3-1
 - Update to 9.0.3
 
