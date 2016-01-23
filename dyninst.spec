@@ -133,8 +133,6 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %postun -p /sbin/ldconfig
 
 %files
-%defattr(-,root,root,-)
-
 %dir %{_libdir}/dyninst
 %{_libdir}/dyninst/*.so.*
 
@@ -144,7 +142,6 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %config(noreplace) /etc/ld.so.conf.d/*
 
 %files doc
-%defattr(-,root,root,-)
 %doc %{dyninst_base}/dynC_API/doc/dynC_API.pdf
 %doc %{dyninst_base}/dyninstAPI/doc/dyninstAPI.pdf
 %doc %{dyninst_base}/instructionAPI/doc/instructionAPI.pdf
@@ -155,18 +152,15 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %doc %{dyninst_base}/symtabAPI/doc/symtabAPI.pdf
 
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/dyninst
 %{_libdir}/dyninst/*.so
 %dir %{_libdir}/cmake
 %{_libdir}/cmake/Dyninst
 
 %files static
-%defattr(-,root,root,-)
 %{_libdir}/dyninst/*.a
 
 %files testsuite
-%defattr(-,root,root,-)
 #{_bindir}/parseThat
 %dir %{_libdir}/dyninst/testsuite/
 # Restore the permissions that were hacked out above, during install.
