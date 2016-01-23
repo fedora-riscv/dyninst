@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 9.1.0
 Exclusiveos: linux
@@ -168,6 +168,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Sat Jan 23 2016 Orion Poplawski <orion@cora.nwra.com> - 9.1.0-2
+- Rebuild for boost 1.60
+
 * Fri Dec 18 2015 Josh Stone <jistone@redhat.com> - 9.1.0-1
 - Update to 9.1.0
 
