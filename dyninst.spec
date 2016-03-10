@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 9.1.0
 Exclusiveos: linux
@@ -11,6 +11,7 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
 Source0: http://www.paradyn.org/release%{version}/DyninstAPI-%{version}.tgz
 Source1: http://www.paradyn.org/release%{version}/Testsuite-%{version}.tgz
+Patch1: dyninst-export.patch
 
 %global dyninst_base DyninstAPI-%{version}
 %global testsuite_base Testsuite-%{version}
@@ -80,6 +81,8 @@ making sure that dyninst works properly.
 %prep
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
+
+%patch1 -p0 -b .export
 
 %build
 
@@ -168,6 +171,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu Mar 10 2016 William Cohen <wcohen@redhat.com> - 9.1.0-4
+- Export libdyninstAPI_RT_init_maxthreads (ref rhbz1315841)
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 9.1.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
