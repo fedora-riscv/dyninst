@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 9.0.3
 Exclusiveos: linux
@@ -11,6 +11,7 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
 Source0: http://www.paradyn.org/release%{version}/DyninstAPI-%{version}.tgz
 Source1: http://www.paradyn.org/release%{version}/Testsuite-%{version}.tgz
+Patch1: dyninst-export.patch
 
 %global dyninst_base DyninstAPI-%{version}
 %global testsuite_base Testsuite-9.0.0
@@ -80,6 +81,8 @@ making sure that dyninst works properly.
 %prep
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
+
+%patch1 -p0 -b .export
 
 %build
 
@@ -174,6 +177,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon May 02 2016 Josh Stone <jistone@redhat.com> - 9.0.3-2
+- Export libdyninstAPI_RT_init_maxthreads
+
 * Fri Sep 04 2015 Josh Stone <jistone@redhat.com> - 9.0.3-1
 - Update to 9.0.3
 
