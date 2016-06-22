@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://www.dyninst.org
 Version: 9.1.0
 Exclusiveos: linux
@@ -12,6 +12,7 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 Source0: http://www.paradyn.org/release%{version}/DyninstAPI-%{version}.tgz
 Source1: http://www.paradyn.org/release%{version}/Testsuite-%{version}.tgz
 Patch1: dyninst-export.patch
+Patch2: dyninst-static-tls.patch
 
 %global dyninst_base DyninstAPI-%{version}
 %global testsuite_base Testsuite-%{version}
@@ -83,6 +84,7 @@ making sure that dyninst works properly.
 %setup -q -T -D -a 1
 
 %patch1 -p0 -b .export
+%patch2 -d %{dyninst_base} -p1 -b .static-tls
 
 %build
 
@@ -171,6 +173,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Jun 21 2016 Josh Stone <jistone@redhat.com> - 9.1.0-5
+- Use static TLS for libdyninstAPI_RT.so
+
 * Thu Mar 10 2016 William Cohen <wcohen@redhat.com> - 9.1.0-4
 - Export libdyninstAPI_RT_init_maxthreads (ref rhbz1315841)
 

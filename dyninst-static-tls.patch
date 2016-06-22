@@ -1,0 +1,51 @@
+From c4dca1b9bca83b180138dfa4d7e5a65736cccb31 Mon Sep 17 00:00:00 2001
+From: Josh Stone <jistone@redhat.com>
+Date: Tue, 21 Jun 2016 16:06:09 -0700
+Subject: [PATCH] RTlib: use static TLS for the tramp guard (#99)
+
+With dynamic TLS, the call to __tls_get_addr() could reach additional
+instrumented code, infinitely recursing back to check the tramp guard.
+Static TLS is a limited resource, but this case in RTlib is special
+enough to warrant it for safety alone, nevermind performance.
+
+(cherry picked from commit 73cd0019856eca0636e652e402f9eaed6ba9dc61)
+
+Make the tramp guard bigger to avoid a glibc bug.
+
+Having just one byte of TLS induces glibc bug 14898 with the definition
+of FORCED_DYNAMIC_TLS_OFFSET.  Bumping to two bytes avoids this.
+
+Fixes #101
+
+(cherry picked from commit d1b4334e13e7cc4a3ee52a34c9d3f63ebff129b2)
+---
+ dyninstAPI_RT/src/RTcommon.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/dyninstAPI_RT/src/RTcommon.c b/dyninstAPI_RT/src/RTcommon.c
+index ab125ff63f0e..f91ff12c943c 100644
+--- a/dyninstAPI_RT/src/RTcommon.c
++++ b/dyninstAPI_RT/src/RTcommon.c
+@@ -117,10 +117,17 @@ int fakeTickCount;
+ #if defined(_MSC_VER)
+ #define TLS_VAR __declspec(thread)
+ #else
+-#define TLS_VAR __thread
++// Note, the initial-exec model gives us static TLS which can be accessed
++// directly, unlike dynamic TLS that calls __tls_get_addr().  Such calls risk
++// recursing back to us if they're also instrumented, ad infinitum.  Static TLS
++// must be used very sparingly though, because it is a limited resource.
++// *** This case is very special -- do not use IE in general libraries! ***
++#define TLS_VAR __thread __attribute__ ((tls_model("initial-exec")))
+ #endif
+ 
+-TLS_VAR int DYNINST_tls_tramp_guard = 1;
++// It's tempting to make this a char, but glibc < 2.17 hits a bug:
++//   https://sourceware.org/bugzilla/show_bug.cgi?id=14898
++static TLS_VAR short DYNINST_tls_tramp_guard = 1;
+ 
+ DLLEXPORT int DYNINST_lock_tramp_guard()
+ {
+-- 
+2.7.4
+
