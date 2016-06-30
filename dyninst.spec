@@ -2,21 +2,20 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 5%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 9.1.0
+Version: 9.2.0
 Exclusiveos: linux
 #dyninst only knows the following architectures
 ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
-Source0: http://www.paradyn.org/release%{version}/DyninstAPI-%{version}.tgz
-Source1: http://www.paradyn.org/release%{version}/Testsuite-%{version}.tgz
-Patch1: dyninst-export.patch
-Patch2: dyninst-static-tls.patch
+Source0: https://github.com/dyninst/dyninst/archive/v9.2.0.tar.gz#/%{name}-%{version}.tar.gz
+Source1: https://github.com/dyninst/dyninst/releases/download/v9.2.0/Testsuite-9.2.0.zip
 
-%global dyninst_base DyninstAPI-%{version}
-%global testsuite_base Testsuite-%{version}
+%global dyninst_base dyninst-%{version}
+%global testsuite_base testsuite-master
 
+BuildRequires: gcc-c++
 BuildRequires: libdwarf-devel >= 20111030
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
@@ -83,9 +82,6 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p0 -b .export
-%patch2 -d %{dyninst_base} -p1 -b .static-tls
-
 %build
 
 cd %{dyninst_base}
@@ -147,6 +143,7 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %config(noreplace) /etc/ld.so.conf.d/*
 
 %files doc
+%doc %{dyninst_base}/dataflowAPI/doc/dataflowAPI.pdf
 %doc %{dyninst_base}/dynC_API/doc/dynC_API.pdf
 %doc %{dyninst_base}/dyninstAPI/doc/dyninstAPI.pdf
 %doc %{dyninst_base}/instructionAPI/doc/instructionAPI.pdf
@@ -166,13 +163,16 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %{_libdir}/dyninst/*.a
 
 %files testsuite
-#{_bindir}/parseThat
+%{_bindir}/parseThat
 %dir %{_libdir}/dyninst/testsuite/
 # Restore the permissions that were hacked out above, during install.
-%attr(755,root,root) %{_libdir}/dyninst/testsuite/*
+%attr(755,root,root) %{_libdir}/dyninst/testsuite/*[!a]
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu Jun 30 2016 Josh Stone <jistone@redhat.com> - 9.2.0-1
+- Update to 9.2.0
+
 * Tue Jun 21 2016 Josh Stone <jistone@redhat.com> - 9.1.0-5
 - Use static TLS for libdyninstAPI_RT.so
 
