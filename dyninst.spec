@@ -5,8 +5,10 @@ Group: Development/Libraries
 Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 9.2.0
-#dyninst only knows the following architectures
-ExclusiveArch: %{ix86} x86_64 %{power64} aarch64
+# Dyninst only has full support for a few architectures.
+# It has some preliminary support for aarch64 and ppc64le,
+# but we're waiting for those to be feature-complete.
+ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
 Source0: https://github.com/dyninst/dyninst/archive/v9.2.0.tar.gz#/%{name}-%{version}.tar.gz
 Source1: https://github.com/dyninst/dyninst/releases/download/v9.2.0/Testsuite-9.2.0.zip
@@ -169,6 +171,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon Aug 15 2016 Josh Stone <jistone@redhat.com>
+- Revert aarch64 and ppc64le support until they're more complete.
+
 * Fri Aug 12 2016 Peter Robinson <pbrobinson@fedoraproject.org> 9.2.0-2
 - aarch64 and ppc64le are now supported
 
