@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://www.dyninst.org
 Version: 9.2.0
 # Dyninst only has full support for a few architectures.
@@ -171,7 +171,7 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
-* Mon Aug 15 2016 Josh Stone <jistone@redhat.com>
+* Mon Aug 15 2016 Josh Stone <jistone@redhat.com> - 9.2.0-3
 - Revert aarch64 and ppc64le support until they're more complete.
 
 * Fri Aug 12 2016 Peter Robinson <pbrobinson@fedoraproject.org> 9.2.0-2
