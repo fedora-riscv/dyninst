@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 9.2.0
 # Dyninst only has full support for a few architectures.
@@ -12,6 +12,8 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
 Source0: https://github.com/dyninst/dyninst/archive/v9.2.0.tar.gz#/%{name}-%{version}.tar.gz
 Source1: https://github.com/dyninst/dyninst/releases/download/v9.2.0/Testsuite-9.2.0.zip
+
+Patch1: dyninst-9.2.0-proccontrol-attach-no-exe.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-master
@@ -82,6 +84,8 @@ making sure that dyninst works properly.
 %prep
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
+
+%patch1 -p1 -d %{dyninst_base} -b .attach-no-exe
 
 %build
 
@@ -171,6 +175,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Sep 14 2016 Josh Stone <jistone@redhat.com> - 9.2.0-4
+- Fix rhbz1373239, process attach without exe specified.
+
 * Mon Aug 15 2016 Josh Stone <jistone@redhat.com> - 9.2.0-3
 - Revert aarch64 and ppc64le support until they're more complete.
 
