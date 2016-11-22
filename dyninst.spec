@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://www.dyninst.org
 Version: 9.2.0
 # Dyninst only has full support for a few architectures.
@@ -14,6 +14,7 @@ Source0: https://github.com/dyninst/dyninst/archive/v9.2.0.tar.gz#/%{name}-%{ver
 Source1: https://github.com/dyninst/dyninst/releases/download/v9.2.0/Testsuite-9.2.0.zip
 
 Patch1: dyninst-9.2.0-proccontrol-attach-no-exe.patch
+Patch2: dyninst-9.2.0-proccontrol-thread-races.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-master
@@ -86,6 +87,7 @@ making sure that dyninst works properly.
 %setup -q -T -D -a 1
 
 %patch1 -p1 -d %{dyninst_base} -b .attach-no-exe
+%patch2 -p1 -d %{dyninst_base} -b .attach-thread-races
 
 %build
 
@@ -175,6 +177,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Nov 22 2016 Josh Stone <jistone@redhat.com> - 9.2.0-5
+- Backport fixes for rhbz1373197, attach thread races.
+
 * Wed Sep 14 2016 Josh Stone <jistone@redhat.com> - 9.2.0-4
 - Fix rhbz1373239, process attach without exe specified.
 

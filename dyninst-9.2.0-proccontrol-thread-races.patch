@@ -1,0 +1,526 @@
+Backported fixes for rhbz1373197 / issue208
+* https://bugzilla.redhat.com/show_bug.cgi?id=1373197
+* https://github.com/dyninst/dyninst/issues/208
+
+* https://github.com/dyninst/dyninst/pull/212
+* https://github.com/dyninst/dyninst/pull/214
+* https://github.com/dyninst/dyninst/pull/259
+* https://github.com/dyninst/dyninst/pull/261
+
+
+commit 251b5549217f716c5ad11509417b3f780d54114c
+Author: Matthew LeGendre <legendre1@llnl.gov>
+Date:   Tue Oct 25 16:13:05 2016 -0700
+
+    Fix errors when thread disappears during attach
+
+diff --git a/proccontrol/src/linux.C b/proccontrol/src/linux.C
+index 4502e357f79f..c55295d836ed 100644
+--- a/proccontrol/src/linux.C
++++ b/proccontrol/src/linux.C
+@@ -1012,17 +1012,28 @@ bool linux_process::plat_getOSRunningStates(std::map<Dyninst::LWP, bool> &runnin
+         snprintf(proc_stat_name, 128, "/proc/%d/stat", *i);
+         FILE *sfile = fopen(proc_stat_name, "r");
+ 
+-        if (sfile == NULL) {
++        if (*i == getPid() && sfile == NULL) {
+             pthrd_printf("Failed to open /proc/%d/stat file\n", *i);
+             setLastError(err_noproc, "Failed to find /proc files for debuggee");
+             return false;
+         }
+-        if( fread(sstat, 1, 256, sfile) == 0 ) {
++        else if (sfile == NULL) {
++           //thread died between the above getThreadLWPs and the /proc/pid/stat open
++           // just drop it from the to-attach list.
++           continue;
++        }
++        size_t result = fread(sstat, 1, 256, sfile);
++        if (*i == getPid() && result == 0) {
+             pthrd_printf("Failed to read /proc/%d/stat file \n", *i);
+             setLastError(err_noproc, "Failed to find /proc files for debuggee");
+             fclose(sfile);
+             return false;
+         }
++        else if (result == 0) {
++           fclose(sfile);
++           continue;
++        }
++        
+         fclose(sfile);
+ 
+         sstat[255] = '\0';
+
+commit 6c690a487a18798dac1bf663e027a3e21354418a
+Author: Josh Stone <jistone@redhat.com>
+Date:   Fri Oct 28 18:09:16 2016 -0700
+
+    proccontrol: refactor plat_getOSRunningStates
+    
+    - The file is now opened with ifstream for RAII.
+    - The former paren_level logic is removed to instead scan for ") R ".
+      (If there were parens in the command, they might not be balanced!)
+
+diff --git a/proccontrol/src/linux.C b/proccontrol/src/linux.C
+index c55295d836ed..56ac407bad1c 100644
+--- a/proccontrol/src/linux.C
++++ b/proccontrol/src/linux.C
+@@ -40,6 +40,7 @@
+ #include <assert.h>
+ #include <time.h>
+ #include <iostream>
++#include <fstream>
+ 
+ #include "common/h/dyn_regs.h"
+ #include "common/h/dyntypes.h"
+@@ -1004,51 +1005,38 @@ bool linux_process::plat_getOSRunningStates(std::map<Dyninst::LWP, bool> &runnin
+     for(vector<Dyninst::LWP>::iterator i = lwps.begin();
+             i != lwps.end(); ++i)
+     {
++        const auto ignore_max = std::numeric_limits<std::streamsize>::max();
+         char proc_stat_name[128];
+-        char sstat[256];
+-        char *status;
+-        int paren_level = 1;
+ 
+         snprintf(proc_stat_name, 128, "/proc/%d/stat", *i);
+-        FILE *sfile = fopen(proc_stat_name, "r");
++        ifstream sfile(proc_stat_name);
+ 
+-        if (*i == getPid() && sfile == NULL) {
+-            pthrd_printf("Failed to open /proc/%d/stat file\n", *i);
+-            setLastError(err_noproc, "Failed to find /proc files for debuggee");
+-            return false;
+-        }
+-        else if (sfile == NULL) {
+-           //thread died between the above getThreadLWPs and the /proc/pid/stat open
+-           // just drop it from the to-attach list.
+-           continue;
+-        }
+-        size_t result = fread(sstat, 1, 256, sfile);
+-        if (*i == getPid() && result == 0) {
+-            pthrd_printf("Failed to read /proc/%d/stat file \n", *i);
+-            setLastError(err_noproc, "Failed to find /proc files for debuggee");
+-            fclose(sfile);
+-            return false;
+-        }
+-        else if (result == 0) {
+-           fclose(sfile);
+-           continue;
+-        }
+-        
+-        fclose(sfile);
++        while (sfile.good()) {
+ 
+-        sstat[255] = '\0';
+-        status = sstat;
++            // The stat looks something like: 123 (command) R 456...
++            // We'll just look for the ") R " part.
++            if (sfile.ignore(ignore_max, ')').peek() == ' ') {
++                char space, state;
+ 
+-        while (*status != '\0' && *(status++) != '(') ;
+-        while (*status != '\0' && paren_level != 0) {
+-            if (*status == '(') paren_level++;
+-            if (*status == ')') paren_level--;
+-            status++;
+-        }
++                // Eat the space we peeked and grab the state char.
++                if (sfile.get(space).get(state).peek() == ' ') {
++                    // Found the state char -- 'T' means it's already stopped.
++                    runningStates.insert(make_pair(*i, (state != 'T')));
++                    break;
++                }
+ 
+-        while (*status == ' ') status++;
++                // Restore the state char and try again
++                sfile.unget();
++            }
++        }
+ 
+-        runningStates.insert(make_pair(*i, (*status != 'T')));
++        if (!sfile.good() && (*i == getPid())) {
++            // Only the main thread is treated as an error.  Other threads may
++            // have exited between getThreadLWPs and /proc/pid/stat open or read.
++            pthrd_printf("Failed to read /proc/%d/stat file\n", *i);
++            setLastError(err_noproc, "Failed to find /proc files for debuggee");
++            return false;
++        }
+     }
+ 
+     return true;
+
+commit f95c058505eb606e0e2f0ce47d0dcf6990bc41ff
+Author: Josh Stone <jistone@redhat.com>
+Date:   Fri Nov 4 18:31:28 2016 -0700
+
+    proccontrol: Synchronize additional threads found during attach
+    
+    When additional threads are found during the attach process, we should
+    synchronize to their stopping point, and check for new threads again,
+    until no new threads are found.  This keeps a more consistent state if
+    threads are racing to start while we're attaching.
+
+diff --git a/proccontrol/src/int_process.h b/proccontrol/src/int_process.h
+index f389175a0a13..20a8648a79ea 100644
+--- a/proccontrol/src/int_process.h
++++ b/proccontrol/src/int_process.h
+@@ -271,7 +271,9 @@ class int_process
+    static bool reattach(int_processSet *pset);
+    virtual bool plat_attach(bool allStopped, bool &should_sync) = 0;
+ 
++   bool attachThreads(bool &found_new_threads);
+    bool attachThreads();
++   bool attachThreadsSync();
+    virtual async_ret_t post_attach(bool wasDetached, std::set<response::ptr> &aresps);
+    async_ret_t initializeAddressSpace(std::set<response::ptr> &async_responses);
+ 
+diff --git a/proccontrol/src/process.C b/proccontrol/src/process.C
+index d231e9ee6d36..c6b0dad80e25 100644
+--- a/proccontrol/src/process.C
++++ b/proccontrol/src/process.C
+@@ -211,8 +211,10 @@ void int_process::plat_threadAttachDone()
+ {
+ }
+ 
+-bool int_process::attachThreads()
++bool int_process::attachThreads(bool &found_new_threads)
+ {
++   found_new_threads = false;
++
+    if (!needIndividualThreadAttach())
+       return true;
+ 
+@@ -224,9 +226,9 @@ bool int_process::attachThreads()
+     * a list of LWPs, but then new threads are created before we attach to
+     * all the existing threads.
+     **/
+-   bool found_new_threads;
++   bool loop_new_threads;
+    do {
+-      found_new_threads = false;
++      loop_new_threads = false;
+       vector<Dyninst::LWP> lwps;
+       bool result = getThreadLWPs(lwps);
+       if (!result) {
+@@ -242,13 +244,56 @@ bool int_process::attachThreads()
+          }
+          pthrd_printf("Creating new thread for %d/%d during attach\n", pid, *i);
+          thr = int_thread::createThread(this, NULL_THR_ID, *i, false, int_thread::as_needs_attach);
+-         found_new_threads = true;
++         found_new_threads = loop_new_threads = true;
+       }
+-   } while (found_new_threads);
++   } while (loop_new_threads);
+ 
+    return true;
+ }
+ 
++bool int_process::attachThreads()
++{
++   bool found_new_threads = false;
++   return attachThreads(found_new_threads);
++}
++
++// Attach any new threads and synchronize, until there are no new threads
++bool int_process::attachThreadsSync()
++{
++   while (true) {
++      bool found_new_threads = false;
++
++      ProcPool()->condvar()->lock();
++      bool result = attachThreads(found_new_threads);
++      if (found_new_threads)
++         ProcPool()->condvar()->broadcast();
++      ProcPool()->condvar()->unlock();
++
++      if (!result) {
++         pthrd_printf("Failed to attach to threads in %d\n", pid);
++         setLastError(err_internal, "Could not get threads during attach\n");
++         return false;
++      }
++
++      if (!found_new_threads)
++         return true;
++
++      pthrd_printf("Wait again for attach from process %d\n", pid);
++      bool proc_exited = false;
++      result = waitAndHandleForProc(true, this, proc_exited);
++      if (!result) {
++         perr_printf("Internal error calling waitAndHandleForProc on %d\n", getPid());
++         setLastError(err_internal, "Error while calling waitAndHandleForProc for attached threads\n");
++         return false;
++      }
++      if (proc_exited) {
++         perr_printf("Process exited while waiting for user thread stop, erroring\n");
++         setLastError(err_exited, "Process exited while thread being stopped.\n");
++         return false;
++      }
++   }
++}
++
+ bool int_process::attach(int_processSet *ps, bool reattach)
+ {
+    bool had_error = false, should_sync = false;
+@@ -443,10 +488,9 @@ bool int_process::attach(int_processSet *ps, bool reattach)
+       int_process *proc = *i;
+       if (proc->getState() == errorstate)
+          continue;
+-      bool result = proc->attachThreads();
++      bool result = proc->attachThreadsSync();
+       if (!result) {
+          pthrd_printf("Failed to attach to threads in %d--now an error\n", proc->pid);
+-         proc->setLastError(err_internal, "Could not get threads during attach\n");
+          procs.erase(i++);
+          had_error = true;
+          continue;
+
+commit 7041993caa9d022eac7b17018ddd3daa5cfe0696
+Author: Josh Stone <jistone@redhat.com>
+Date:   Wed Nov 9 18:13:28 2016 -0800
+
+    proccontrol: move thread sync to linux_process, and count neonatal
+
+diff --git a/proccontrol/src/int_process.h b/proccontrol/src/int_process.h
+index 20a8648a79ea..0c292f297b2a 100644
+--- a/proccontrol/src/int_process.h
++++ b/proccontrol/src/int_process.h
+@@ -273,7 +273,8 @@ class int_process
+ 
+    bool attachThreads(bool &found_new_threads);
+    bool attachThreads();
+-   bool attachThreadsSync();
++   virtual bool plat_attachThreadsSync();
++
+    virtual async_ret_t post_attach(bool wasDetached, std::set<response::ptr> &aresps);
+    async_ret_t initializeAddressSpace(std::set<response::ptr> &async_responses);
+ 
+diff --git a/proccontrol/src/linux.C b/proccontrol/src/linux.C
+index 56ac407bad1c..f230967af034 100644
+--- a/proccontrol/src/linux.C
++++ b/proccontrol/src/linux.C
+@@ -1113,6 +1113,44 @@ bool linux_process::plat_attach(bool, bool &)
+    return true;
+ }
+ 
++// Attach any new threads and synchronize, until there are no new threads
++bool linux_process::plat_attachThreadsSync()
++{
++   while (true) {
++      bool found_new_threads = false;
++
++      ProcPool()->condvar()->lock();
++      bool result = attachThreads(found_new_threads);
++      if (found_new_threads)
++         ProcPool()->condvar()->broadcast();
++      ProcPool()->condvar()->unlock();
++
++      if (!result) {
++         pthrd_printf("Failed to attach to threads in %d\n", pid);
++         setLastError(err_internal, "Could not get threads during attach\n");
++         return false;
++      }
++
++      if (!found_new_threads)
++         return true;
++
++      while (Counter::processCount(Counter::NeonatalThreads, this) > 0) {
++         bool proc_exited = false;
++         pthrd_printf("Waiting for neonatal threads in process %d\n", pid);
++         result = waitAndHandleForProc(true, this, proc_exited);
++         if (!result) {
++            perr_printf("Internal error calling waitAndHandleForProc on %d\n", getPid());
++            return false;
++         }
++         if (proc_exited) {
++            perr_printf("Process exited while waiting for user thread stop, erroring\n");
++            setLastError(err_exited, "Process exited while thread being stopped.\n");
++            return false;
++         }
++      }
++   }
++}
++
+ bool linux_process::plat_attachWillTriggerStop() {
+     char procName[64];
+     char cmd[256];
+diff --git a/proccontrol/src/linux.h b/proccontrol/src/linux.h
+index 4972fb71143f..56326ad9e6a8 100644
+--- a/proccontrol/src/linux.h
++++ b/proccontrol/src/linux.h
+@@ -111,6 +111,7 @@ class linux_process : public sysv_process, public unix_process, public thread_db
+    virtual bool plat_create();
+    virtual bool plat_create_int();
+    virtual bool plat_attach(bool allStopped, bool &);
++   virtual bool plat_attachThreadsSync();
+    virtual bool plat_attachWillTriggerStop();
+    virtual bool plat_forked();
+    virtual bool plat_execed();
+diff --git a/proccontrol/src/process.C b/proccontrol/src/process.C
+index c6b0dad80e25..945bc35744ba 100644
+--- a/proccontrol/src/process.C
++++ b/proccontrol/src/process.C
+@@ -257,41 +257,16 @@ bool int_process::attachThreads()
+    return attachThreads(found_new_threads);
+ }
+ 
+-// Attach any new threads and synchronize, until there are no new threads
+-bool int_process::attachThreadsSync()
++bool int_process::plat_attachThreadsSync()
+ {
+-   while (true) {
+-      bool found_new_threads = false;
+-
+-      ProcPool()->condvar()->lock();
+-      bool result = attachThreads(found_new_threads);
+-      if (found_new_threads)
+-         ProcPool()->condvar()->broadcast();
+-      ProcPool()->condvar()->unlock();
+-
+-      if (!result) {
+-         pthrd_printf("Failed to attach to threads in %d\n", pid);
+-         setLastError(err_internal, "Could not get threads during attach\n");
+-         return false;
+-      }
+-
+-      if (!found_new_threads)
+-         return true;
+-
+-      pthrd_printf("Wait again for attach from process %d\n", pid);
+-      bool proc_exited = false;
+-      result = waitAndHandleForProc(true, this, proc_exited);
+-      if (!result) {
+-         perr_printf("Internal error calling waitAndHandleForProc on %d\n", getPid());
+-         setLastError(err_internal, "Error while calling waitAndHandleForProc for attached threads\n");
+-         return false;
+-      }
+-      if (proc_exited) {
+-         perr_printf("Process exited while waiting for user thread stop, erroring\n");
+-         setLastError(err_exited, "Process exited while thread being stopped.\n");
+-         return false;
+-      }
++   // By default, platforms just call the idempotent attachThreads().
++   // Some platforms may override, e.g. Linux should sync with all threads.
++   if (!attachThreads()) {
++      pthrd_printf("Failed to attach to threads in %d\n", pid);
++      setLastError(err_internal, "Could not get threads during attach\n");
++      return false;
+    }
++   return true;
+ }
+ 
+ bool int_process::attach(int_processSet *ps, bool reattach)
+@@ -488,7 +463,7 @@ bool int_process::attach(int_processSet *ps, bool reattach)
+       int_process *proc = *i;
+       if (proc->getState() == errorstate)
+          continue;
+-      bool result = proc->attachThreadsSync();
++      bool result = proc->plat_attachThreadsSync();
+       if (!result) {
+          pthrd_printf("Failed to attach to threads in %d--now an error\n", proc->pid);
+          procs.erase(i++);
+
+commit ce0f92e8a61aeb8ca0fea7bb2d2d6a76d38ec6d2
+Author: Josh Stone <jistone@redhat.com>
+Date:   Wed Nov 16 13:44:37 2016 -0800
+
+    proccontrol: scrub newly created threads that fail to attach
+    
+    If `int_thread::createThread` failed to actually attach to the thread,
+    it was leaving the thread object in the process in the `neonatal` state.
+    This failed assertions later when trying to stop all of the process's
+    threads, as it would have handler `stopped` and generator `neonatal`.
+    
+    Now when a thread attach fails, it is set to `errorstate` and removed
+    from the active thread pools.  The assumption is that this thread simply
+    exited before we could attach, but we can't be sure of that without
+    having access to the ptrace return code (`ESRCH`).
+
+diff --git a/proccontrol/src/process.C b/proccontrol/src/process.C
+index 945bc35744ba..66397f5ad93d 100644
+--- a/proccontrol/src/process.C
++++ b/proccontrol/src/process.C
+@@ -3495,8 +3495,14 @@ int_thread *int_thread::createThread(int_process *proc,
+    bool result = newthr->attach();
+    if (!result) {
+       pthrd_printf("Failed to attach to new thread %d/%d\n", proc->getPid(), lwp_id);
++      newthr->getUserState().setState(errorstate);
++      newthr->getHandlerState().setState(errorstate);
++      newthr->getGeneratorState().setState(errorstate);
++      ProcPool()->rmThread(newthr);
++      proc->threadPool()->rmThread(newthr);
+       return NULL;
+    }
++
+    if (newthr->isUser() && newthr->getUserState().getState() == neonatal) {
+ 	   newthr->getUserState().setState(neonatal_intermediate);
+ 	   newthr->getHandlerState().setState(neonatal_intermediate);
+
+commit dae2e3d9856c9245e37e1fc3d81ab59be67f932b
+Author: Josh Stone <jistone@redhat.com>
+Date:   Fri Nov 18 14:49:41 2016 -0800
+
+    proccontrol: fix double-increment while erasing a dead process
+    
+    In the attach loop over waitfor_startup(), processes which fail are
+    erased from the set.  However, the iterator was getting incremented
+    again, which will skip the next process or even cause undefined behavior
+    if already at the end of the list.
+    
+    With GCC 6.2.1, that UB manifested as an infinite loop on a self-
+    referential rbtree node.
+    
+    The simple solution is to `continue` the loop after `erase(i++)`, as is
+    done in many other places with this same pattern.
+
+diff --git a/proccontrol/src/process.C b/proccontrol/src/process.C
+index 66397f5ad93d..32bfc8fb2a5c 100644
+--- a/proccontrol/src/process.C
++++ b/proccontrol/src/process.C
+@@ -453,6 +453,7 @@ bool int_process::attach(int_processSet *ps, bool reattach)
+          pthrd_printf("Error waiting for attach to %d\n", proc->pid);
+          procs.erase(i++);
+          had_error = true;
++         continue;
+       }
+       i++;
+    }
+
+commit cb81d5342d9b99143312186ef558e49bcb37cd65
+Author: Josh Stone <jistone@redhat.com>
+Date:   Mon Nov 21 11:52:48 2016 -0800
+
+    proccontrol: fix another process erasure during attach
+    
+    If a process initially failed to attach threads, a `pthrd_printf` was
+    indicating that it would try again, but the process was getting erased
+    from the set while incorrectly causing the iterator to double-increment.
+    
+    Now the messages about "will try again" and "now an error" are changed
+    to simply report an immediate error, and it continus the loop after
+    process erasure to avoid incrementing the iterator again.
+
+diff --git a/proccontrol/src/process.C b/proccontrol/src/process.C
+index 32bfc8fb2a5c..548f6908f9d1 100644
+--- a/proccontrol/src/process.C
++++ b/proccontrol/src/process.C
+@@ -381,8 +381,10 @@ bool int_process::attach(int_processSet *ps, bool reattach)
+       pthrd_printf("Attaching to threads for %d\n", proc->getPid());
+       bool result = proc->attachThreads();
+       if (!result) {
+-         pthrd_printf("Could not attach to threads in %d--will try again\n", proc->pid);
++         pthrd_printf("Failed to attach to threads in %d\n", proc->pid);
+          procs.erase(i++);
++         had_error = true;
++         continue;
+       }
+ 
+       if (reattach) {
+@@ -466,7 +468,7 @@ bool int_process::attach(int_processSet *ps, bool reattach)
+          continue;
+       bool result = proc->plat_attachThreadsSync();
+       if (!result) {
+-         pthrd_printf("Failed to attach to threads in %d--now an error\n", proc->pid);
++         pthrd_printf("Failed to attach to threads in %d\n", proc->pid);
+          procs.erase(i++);
+          had_error = true;
+          continue;
