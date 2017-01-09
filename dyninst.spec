@@ -2,22 +2,19 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 5%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 9.2.0
+Version: 9.3.0
 # Dyninst only has full support for a few architectures.
 # It has some preliminary support for aarch64 and ppc64le,
 # but we're waiting for those to be feature-complete.
 ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
-Source0: https://github.com/dyninst/dyninst/archive/v9.2.0.tar.gz#/%{name}-%{version}.tar.gz
-Source1: https://github.com/dyninst/dyninst/releases/download/v9.2.0/Testsuite-9.2.0.zip
-
-Patch1: dyninst-9.2.0-proccontrol-attach-no-exe.patch
-Patch2: dyninst-9.2.0-proccontrol-thread-races.patch
+Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
+Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{version}.tar.gz
 
 %global dyninst_base dyninst-%{version}
-%global testsuite_base testsuite-master
+%global testsuite_base testsuite-%{version}
 
 BuildRequires: gcc-c++
 BuildRequires: libdwarf-devel >= 20111030
@@ -85,9 +82,6 @@ making sure that dyninst works properly.
 %prep
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
-
-%patch1 -p1 -d %{dyninst_base} -b .attach-no-exe
-%patch2 -p1 -d %{dyninst_base} -b .attach-thread-races
 
 %build
 
@@ -177,6 +171,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon Jan 09 2017 Josh Stone <jistone@redhat.com> - 9.3.0-1
+- Update to 9.3.0
+
 * Tue Nov 22 2016 Josh Stone <jistone@redhat.com> - 9.2.0-5
 - Backport fixes for rhbz1373197, attach thread races.
 
