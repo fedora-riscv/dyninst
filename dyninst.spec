@@ -13,6 +13,8 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
 Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{version}.tar.gz
 
+Patch1: testsuite-9.3.0-junit-nullptr.patch
+
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{version}
 
@@ -82,6 +84,13 @@ making sure that dyninst works properly.
 %prep
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
+
+%patch1 -p0 -b.nullptr
+
+# cotire seems to cause non-deterministic gcc errors
+# https://bugzilla.redhat.com/show_bug.cgi?id=1420551
+sed -i.cotire -e 's/USE_COTIRE true/USE_COTIRE false/' \
+  %{dyninst_base}/cmake/shared.cmake
 
 %build
 
