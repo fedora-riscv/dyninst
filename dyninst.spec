@@ -2,21 +2,24 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 2%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 9.3.0
+Version: 9.3.1
 # Dyninst only has full support for a few architectures.
 # It has some preliminary support for aarch64 and ppc64le,
 # but we're waiting for those to be feature-complete.
 ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
-Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{version}.tar.gz
+# Explicit version since it does not match the source version
+Source1: https://github.com/dyninst/testsuite/archive/v9.3.0/testsuite-9.3.0.tar.gz
 
 Patch1: testsuite-9.3.0-junit-nullptr.patch
+Patch2: dyninst-9.3.1-Address.patch
 
 %global dyninst_base dyninst-%{version}
-%global testsuite_base testsuite-%{version}
+# Explicit version since it does not match the source version
+%global testsuite_base testsuite-9.3.0
 
 BuildRequires: gcc-c++
 BuildRequires: libdwarf-devel >= 20111030
@@ -86,6 +89,7 @@ making sure that dyninst works properly.
 %setup -q -T -D -a 1
 
 %patch1 -p0 -b.nullptr
+%patch2 -p0 -b.Address
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -180,6 +184,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon Mar 06 2017 Stan Cox <scox@redhat.com> - 9.3.1-1
+- Update to 9.3.1
+
 * Wed Feb 8 2017 William Cohen <wcohen@redhat.com> - 9.3.0-2
 - Rebuild for boost 1.63
 
