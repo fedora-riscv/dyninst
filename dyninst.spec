@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://www.dyninst.org
 Version: 9.3.2
 # Dyninst only has full support for a few architectures.
@@ -182,6 +182,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu Jul 20 2017 Kalev Lember <klember@redhat.com> - 9.3.2-3
+- Rebuilt for Boost 1.64
+
 * Fri Jul 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 9.3.2-2
 - Rebuild due to bug in RPM (RHBZ #1468476)
 
