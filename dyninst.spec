@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://www.dyninst.org
 Version: 9.3.2
 # Dyninst only has full support for a few architectures.
@@ -168,7 +168,6 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %files devel
 %{_includedir}/dyninst
 %{_libdir}/dyninst/*.so
-%dir %{_libdir}/cmake
 %{_libdir}/cmake/Dyninst
 
 %files static
@@ -182,6 +181,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Sun Aug 06 2017 Björn Esser <besser82@fedoraproject.org> - 9.3.2-6
+- Rebuilt for AutoReq cmake-filesystem
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 9.3.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
