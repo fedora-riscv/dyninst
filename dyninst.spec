@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://www.dyninst.org
 Version: 9.3.2
 # Dyninst only has full support for a few architectures.
@@ -15,6 +15,8 @@ Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{versio
 Source1: https://github.com/dyninst/testsuite/archive/v9.3.0/testsuite-9.3.0.tar.gz
 
 Patch1: testsuite-9.3.0-junit-nullptr.patch
+Patch2: addrtranslate-sysv.patch
+Patch3: Object-elf.patch
 
 %global dyninst_base dyninst-%{version}
 # Explicit version since it does not match the source version
@@ -88,6 +90,8 @@ making sure that dyninst works properly.
 %setup -q -T -D -a 1
 
 %patch1 -p0 -b.nullptr
+%patch2 -p0 -b.addrtrans
+%patch3 -p0 -b.objelf
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -181,6 +185,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Oct 04 2017 Stan Cox <scox@redhat.com> - 9.3.2-7
+- Fix swbz22248, handle R_*_IRELATIV, swbz22004, ignore linux-vdso64.so.1
+
 * Sun Aug 06 2017 Björn Esser <besser82@fedoraproject.org> - 9.3.2-6
 - Rebuilt for AutoReq cmake-filesystem
 
