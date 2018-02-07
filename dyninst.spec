@@ -30,6 +30,7 @@ BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
 BuildRequires: binutils-devel
 BuildRequires: cmake
+BuildRequires: libtirpc-devel
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran glibc-static libstdc++-static nasm
