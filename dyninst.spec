@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://www.dyninst.org
 Version: 9.3.2
 # Dyninst only has full support for a few architectures.
@@ -185,6 +185,10 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Feb 07 2018 Than Ngo <than@redhat.com> - - 9.3.2-10
+- fix FTBS with gcc8
+- fix for using libtirpc, Sun RPC Interfaces is removed in latest glibc
+
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 9.3.2-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
