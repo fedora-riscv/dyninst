@@ -17,6 +17,8 @@ Source1: https://github.com/dyninst/testsuite/archive/v9.3.0/testsuite-9.3.0.tar
 Patch1: testsuite-9.3.0-junit-nullptr.patch
 Patch2: addrtranslate-sysv.patch
 Patch3: Object-elf.patch
+Patch4: dyninst-9.3.2-gcc8.patch
+Patch5: dyninst-9.3.2-glibc-rpc.patch
 
 %global dyninst_base dyninst-%{version}
 # Explicit version since it does not match the source version
@@ -92,6 +94,8 @@ making sure that dyninst works properly.
 %patch1 -p0 -b.nullptr
 %patch2 -p0 -b.addrtrans
 %patch3 -p0 -b.objelf
+%patch4 -p1 -b.gcc8
+%patch5 -p1 -b.glibc-rpc
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
