@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: http://www.dyninst.org
 Version: 9.3.2
 # Dyninst only has full support for a few architectures.
@@ -190,6 +190,10 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Mar 07 2018 Adam Williamson <awilliam@redhat.com> - 9.3.2-11
+- Rebuild to fix GCC 8 mis-compilation
+  See https://da.gd/YJVwk ("GCC 8 ABI change on x86_64")
+
 * Wed Feb 07 2018 Than Ngo <than@redhat.com> - - 9.3.2-10
 - fix FTBS with gcc8
 - fix for using libtirpc, Sun RPC Interfaces is removed in latest glibc
