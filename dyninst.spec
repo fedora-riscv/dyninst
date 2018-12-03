@@ -8,7 +8,7 @@ Version: 10.0.0
 # Dyninst only has full support for a few architectures.
 # It has some preliminary support for aarch64 and ppc64le,
 # but we're waiting for those to be feature-complete.
-ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
+ExclusiveArch: %{ix86} x86_64 ppc64le
 
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
 # Explicit version since it does not match the source version
@@ -204,7 +204,7 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %changelog
 * Mon Dec 03 2018 Frank Ch. Eigler <fche@redhat.com> - 10.0.0-2
 - Add tbb-devel Requires:
-- Add ppc64le and aarch64 into ExclusiveArch:
+- Add ppc64le into ExclusiveArch:
 
 * Tue Nov 13 2018 Stan Cox <scox@redhat.com> - 10.0.0-1
 - Update to 10.0.0
