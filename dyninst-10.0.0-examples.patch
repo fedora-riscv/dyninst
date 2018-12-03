@@ -1,0 +1,42 @@
+# workaround for https://github.com/dyninst/dyninst/issues/396
+
+--- ./dyninst-10.0.0/examples/CMakeLists.txt.sv	2018-11-09 11:48:08.000000000 -0500
++++ ./dyninst-10.0.0/examples/CMakeLists.txt	2018-11-13 11:35:20.109650373 -0500
+@@ -1,19 +1,19 @@
+ 
+ 
+-add_executable(unstrip unstrip/unstrip.C
+-                       unstrip/util.C
+-                       unstrip/types.C
+-                       unstrip/semanticDescriptor.C
+-                       unstrip/database.C
+-                       unstrip/fingerprint.C
+-                       unstrip/callback.C)
++add_executable(unstrip unstrip.dir/unstrip.C
++                       unstrip.dir/util.C
++                       unstrip.dir/types.C
++                       unstrip.dir/semanticDescriptor.C
++                       unstrip.dir/database.C
++                       unstrip.dir/fingerprint.C
++                       unstrip.dir/callback.C)
+ add_dependencies(unstrip parseAPI symtabAPI instructionAPI common)
+ target_link_libraries(unstrip parseAPI symtabAPI instructionAPI common dynDwarf dynElf ${Boost_LIBRARIES})
+ 
+-add_executable(codeCoverage codeCoverage/codeCoverage.C)
++add_executable(codeCoverage codeCoverage.dir/codeCoverage.C)
+ add_dependencies(codeCoverage dyninstAPI patchAPI parseAPI symtabAPI instructionAPI pcontrol common stackwalk dynDwarf dynElf)
+ target_link_libraries(codeCoverage dyninstAPI patchAPI parseAPI symtabAPI instructionAPI pcontrol common stackwalk dynDwarf dynElf ${Boost_LIBRARIES})
+ 
+-add_library(Inst SHARED codeCoverage/libInst.C)
++add_library(Inst SHARED codeCoverage.dir/libInst.C)
+ 
+ add_executable(cfg_to_dot ../parseAPI/doc/example.cc)
+@@ -29,5 +29,5 @@
+ )
+ 
+-install (
+-        FILES unstrip/ddb.db unstrip/params.db unstrip/unistd.db DESTINATION ${INSTALL_BIN_DIR}
+-)
++# install (
++#         FILES unstrip.dir/ddb.db unstrip.dir/params.db unstrip.dir/unistd.db DESTINATION ${INSTALL_BIN_DIR}
++# )

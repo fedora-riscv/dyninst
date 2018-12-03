@@ -2,9 +2,9 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 12%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 9.3.2
+Version: 10.0.0
 # Dyninst only has full support for a few architectures.
 # It has some preliminary support for aarch64 and ppc64le,
 # but we're waiting for those to be feature-complete.
@@ -12,28 +12,26 @@ ExclusiveArch: %{ix86} x86_64 ppc ppc64
 
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
 # Explicit version since it does not match the source version
-Source1: https://github.com/dyninst/testsuite/archive/v9.3.0/testsuite-9.3.0.tar.gz
+Source1: http://scox.fedorapeople.org/testsuite-9.4.0.tar.gz
 
-Patch1: testsuite-9.3.0-junit-nullptr.patch
-Patch2: addrtranslate-sysv.patch
-Patch3: Object-elf.patch
-Patch4: dyninst-9.3.2-gcc8.patch
-Patch5: dyninst-9.3.2-glibc-rpc.patch
+Patch1: dyninst-10.0.0-examples.patch
+Patch2: dyninst-10.0.0-doc.patch
 
 %global dyninst_base dyninst-%{version}
 # Explicit version since it does not match the source version
-%global testsuite_base testsuite-9.3.0
+%global testsuite_base testsuite-9.4.0
 
 BuildRequires: gcc-c++
-BuildRequires: libdwarf-devel >= 20111030
+BuildRequires: elfutils-devel
 BuildRequires: elfutils-libelf-devel
 BuildRequires: boost-devel
 BuildRequires: binutils-devel
 BuildRequires: cmake
 BuildRequires: libtirpc-devel
+BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
-BuildRequires: gcc-gfortran glibc-static libstdc++-static nasm
+BuildRequires: gcc-gfortran glibc-static libstdc++-static nasm libxml2-devel
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -92,20 +90,26 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p0 -b.nullptr
-%patch2 -p0 -b.addrtrans
-%patch3 -p0 -b.objelf
-%patch4 -p1 -b.gcc8
-%patch5 -p1 -b.glibc-rpc
+%patch1 -p1 -b.ex
+%patch2 -p1 -b.doc
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
 sed -i.cotire -e 's/USE_COTIRE true/USE_COTIRE false/' \
   %{dyninst_base}/cmake/shared.cmake
 
+# Avoid Dir/executable name clash with in tree build
+mv %{dyninst_base}/examples/unstrip %{dyninst_base}/examples/unstrip.dir
+mv %{dyninst_base}/examples/codeCoverage %{dyninst_base}/examples/codeCoverage.dir
+
 %build
 
 cd %{dyninst_base}
+
+CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
+LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
+CXXFLAGS="$CFLAGS"
+export CFLAGS CXXFLAGS LDFLAGS
 
 %cmake \
  -DENABLE_STATIC_LIBS=1 \
@@ -119,7 +123,9 @@ cd %{dyninst_base}
 # Hack to install dyninst nearby, so the testsuite can use it
 make DESTDIR=../install install
 find ../install -name '*.cmake' -execdir \
-  sed -i -e 's!%{_prefix}!../install&!' '{}' '+'
+     sed -i -e 's!%{_prefix}!../install&!' '{}' '+'
+# cmake mistakenly looks for libtbb.so in the dyninst install dir
+sed -i '/libtbb.so/ s/".*usr/"\/usr/' $PWD/../install%{_libdir}/cmake/Dyninst/commonTargets.cmake
 
 cd ../%{testsuite_base}
 %cmake \
@@ -159,7 +165,7 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %{_libdir}/dyninst/*.so.*
 
 %doc %{dyninst_base}/COPYRIGHT
-%doc %{dyninst_base}/LGPL
+%doc %{dyninst_base}/LICENSE.md
 
 %config(noreplace) /etc/ld.so.conf.d/*
 
@@ -184,12 +190,20 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 
 %files testsuite
 %{_bindir}/parseThat
+%exclude %{_bindir}/cfg_to_dot
+%exclude %{_libdir}/codeCoverage
+%exclude /usr/bin/codeCoverage
+%exclude %{_libdir}/unstrip
+%exclude /usr/bin/unstrip
 %dir %{_libdir}/dyninst/testsuite/
 # Restore the permissions that were hacked out above, during install.
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*[!a]
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Nov 13 2018 Stan Cox <scox@redhat.com> - 10.0.0-1
+- Update to 10.0.0
+
 * Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 9.3.2-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
