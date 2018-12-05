@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://www.dyninst.org
 Version: 10.0.0
 # Dyninst only has full support for a few architectures.
@@ -16,6 +16,7 @@ Source1: http://scox.fedorapeople.org/testsuite-9.4.0.tar.gz
 
 Patch1: dyninst-10.0.0-examples.patch
 Patch2: dyninst-10.0.0-doc.patch
+Patch3: dyninst-10.0.0-result.patch
 
 %global dyninst_base dyninst-%{version}
 # Explicit version since it does not match the source version
@@ -93,6 +94,7 @@ making sure that dyninst works properly.
 
 %patch1 -p1 -b.ex
 %patch2 -p1 -b.doc
+%patch3 -p1 -b.result
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -202,6 +204,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Dec 05 2018 Stan Cox <scox@redhat.com> - 10.0.0-3
+- Patch Result.h for i386.
+
 * Mon Dec 03 2018 Frank Ch. Eigler <fche@redhat.com> - 10.0.0-2
 - Add tbb-devel Requires:
 - Add ppc64le into ExclusiveArch:
