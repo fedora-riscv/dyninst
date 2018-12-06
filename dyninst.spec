@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 10.0.0
 # Dyninst only has full support for a few architectures.
@@ -204,6 +204,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Dec 05 2018 Stan Cox <scox@redhat.com> - 10.0.0-4
+- Use PRIx64
+
 * Wed Dec 05 2018 Stan Cox <scox@redhat.com> - 10.0.0-3
 - Patch Result.h for i386.
 
