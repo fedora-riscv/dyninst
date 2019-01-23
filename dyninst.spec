@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://www.dyninst.org
 Version: 10.0.0
 # Dyninst only has full support for a few architectures.
@@ -120,7 +120,8 @@ export CFLAGS CXXFLAGS LDFLAGS
  -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
  -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
  -DCMAKE_BUILD_TYPE=None \
- -DCMAKE_SKIP_RPATH:BOOL=YES
+ -DCMAKE_SKIP_RPATH:BOOL=YES \
+ .
 %make_build
 
 # Hack to install dyninst nearby, so the testsuite can use it
@@ -204,6 +205,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Jan 23 2019 Björn Esser <besser82@fedoraproject.org> - 10.0.0-5
+- Append curdir to CMake invokation. (#1668512)
+
 * Wed Dec 05 2018 Stan Cox <scox@redhat.com> - 10.0.0-4
 - Use PRIx64
 
