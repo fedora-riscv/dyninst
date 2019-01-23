@@ -136,7 +136,8 @@ cd ../%{testsuite_base}
  -DDyninst_DIR:PATH=$PWD/../install%{_libdir}/cmake/Dyninst \
  -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
  -DCMAKE_BUILD_TYPE:STRING=Debug \
- -DCMAKE_SKIP_RPATH:BOOL=YES
+ -DCMAKE_SKIP_RPATH:BOOL=YES \
+ .
 %make_build
 
 %install
