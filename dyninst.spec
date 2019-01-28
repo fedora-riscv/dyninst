@@ -1,7 +1,6 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Group: Development/Libraries
 Release: 5%{?dist}
 URL: http://www.dyninst.org
 Version: 10.0.0
@@ -53,13 +52,11 @@ the creation of tools and applications that use run-time code patching.
 
 %package doc
 Summary: Documentation for using the Dyninst API
-Group: Documentation
 %description doc
 dyninst-doc contains API documentation for the Dyninst libraries.
 
 %package devel
 Summary: Header files for the compiling programs with Dyninst
-Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: boost-devel
 Requires: tbb-devel
@@ -71,7 +68,6 @@ that uses Dyninst.
 
 %package static
 Summary: Static libraries for the compiling programs with Dyninst
-Group: Development/System
 Requires: dyninst-devel = %{version}-%{release}
 %description static
 dyninst-static includes the static versions of the library files for
@@ -79,7 +75,6 @@ the dyninst user-space libraries and interfaces.
 
 %package testsuite
 Summary: Programs for testing Dyninst
-Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: dyninst-devel = %{version}-%{release}
 Requires: dyninst-static = %{version}-%{release}
