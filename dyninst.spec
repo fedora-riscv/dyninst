@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://www.dyninst.org
 Version: 10.0.0
 # Dyninst only has full support for a few architectures.
@@ -201,6 +201,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 10.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
 * Wed Jan 23 2019 Björn Esser <besser82@fedoraproject.org> - 10.0.0-5
 - Append curdir to CMake invokation. (#1668512)
 
