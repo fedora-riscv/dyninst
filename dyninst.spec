@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://www.dyninst.org
 Version: 10.0.0
 # Dyninst only has full support for a few architectures.
@@ -16,6 +16,7 @@ Source1: http://scox.fedorapeople.org/testsuite-9.4.0.tar.gz
 Patch1: dyninst-10.0.0-examples.patch
 Patch2: dyninst-10.0.0-doc.patch
 Patch3: dyninst-10.0.0-result.patch
+Patch4: dyninst-10.0.0-tribool.patch
 
 %global dyninst_base dyninst-%{version}
 # Explicit version since it does not match the source version
@@ -90,6 +91,7 @@ making sure that dyninst works properly.
 %patch1 -p1 -b.ex
 %patch2 -p1 -b.doc
 %patch3 -p1 -b.result
+%patch4 -p1 -b.tribool
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -201,6 +203,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon Feb 4  2019 William Cohen <wcohen@redhat.com> - 10.0.0-7
+- Fix FTBFS due to move to boost 1.69 and tribool changes.
+
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 10.0.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
