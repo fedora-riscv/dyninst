@@ -1,26 +1,19 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 7%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 10.0.0
-# Dyninst only has full support for a few architectures.
-# It has some preliminary support for aarch64 and ppc64le,
-# but we're waiting for those to be feature-complete.
-ExclusiveArch: %{ix86} x86_64 ppc64le
+Version: 10.1.0
+ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
-# Explicit version since it does not match the source version
-Source1: http://scox.fedorapeople.org/testsuite-9.4.0.tar.gz
+Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{version}.tar.gz
 
-Patch1: dyninst-10.0.0-examples.patch
-Patch2: dyninst-10.0.0-doc.patch
-Patch3: dyninst-10.0.0-result.patch
-Patch4: dyninst-10.0.0-tribool.patch
+Patch1: testsuite-10.1.0-gettid.patch
+Patch2: testsuite-10.1.0-386.patch
 
 %global dyninst_base dyninst-%{version}
-# Explicit version since it does not match the source version
-%global testsuite_base testsuite-9.4.0
+%global testsuite_base testsuite-%{version}
 
 BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
@@ -57,7 +50,7 @@ Summary: Documentation for using the Dyninst API
 dyninst-doc contains API documentation for the Dyninst libraries.
 
 %package devel
-Summary: Header files for the compiling programs with Dyninst
+Summary: Header files for compiling programs with Dyninst
 Requires: dyninst = %{version}-%{release}
 Requires: boost-devel
 Requires: tbb-devel
@@ -88,19 +81,13 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1 -b.ex
-%patch2 -p1 -b.doc
-%patch3 -p1 -b.result
-%patch4 -p1 -b.tribool
+%patch1 -p1 -bgettid
+%patch2 -p1 -b.386
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
 sed -i.cotire -e 's/USE_COTIRE true/USE_COTIRE false/' \
   %{dyninst_base}/cmake/shared.cmake
-
-# Avoid Dir/executable name clash with in tree build
-mv %{dyninst_base}/examples/unstrip %{dyninst_base}/examples/unstrip.dir
-mv %{dyninst_base}/examples/codeCoverage %{dyninst_base}/examples/codeCoverage.dir
 
 %build
 
@@ -152,19 +139,14 @@ cd ../%{testsuite_base}
 mkdir -p %{buildroot}/etc/ld.so.conf.d
 echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 
-# Ugly hack to mask testsuite files from debuginfo extraction.  Running the
-# testsuite requires debuginfo, so extraction is useless.  However, debuginfo
-# extraction is still nice for the main libraries, so we don't want to disable
-# it package-wide.  The permissions are restored by attr(755,-,-) in files.
-find %{buildroot}%{_libdir}/dyninst/testsuite/ \
-  -type f '!' -name '*.a' -execdir chmod 644 '{}' '+'
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %dir %{_libdir}/dyninst
 %{_libdir}/dyninst/*.so.*
+# dyninst mutators dlopen the runtime library
+%{_libdir}/dyninst/libdyninstAPI_RT.so
 
 %doc %{dyninst_base}/COPYRIGHT
 %doc %{dyninst_base}/LICENSE.md
@@ -193,16 +175,19 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %files testsuite
 %{_bindir}/parseThat
 %exclude %{_bindir}/cfg_to_dot
-%exclude %{_libdir}/codeCoverage
 %exclude /usr/bin/codeCoverage
-%exclude %{_libdir}/unstrip
 %exclude /usr/bin/unstrip
+%exclude /usr/bin/ddb.db
+%exclude /usr/bin/params.db
+%exclude /usr/bin/unistd.db
 %dir %{_libdir}/dyninst/testsuite/
-# Restore the permissions that were hacked out above, during install.
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*[!a]
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed May 29 2019 Stan Cox <scox@redhat.com> - 10.1.0-1
+- Update to 10.1.0
+
 * Mon Feb 4  2019 William Cohen <wcohen@redhat.com> - 10.0.0-7
 - Fix FTBFS due to move to boost 1.69 and tribool changes.
 
