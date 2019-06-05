@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 10.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -9,8 +9,9 @@ ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
 Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{version}.tar.gz
 
-Patch1: testsuite-10.1.0-gettid.patch
-Patch2: testsuite-10.1.0-386.patch
+Patch1: dyninst-10.1.0-result.patch
+Patch2: testsuite-10.1.0-gettid.patch
+Patch3: testsuite-10.1.0-386.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{version}
@@ -81,8 +82,9 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1 -bgettid
-%patch2 -p1 -b.386
+%patch1 -p1 -b.result
+%patch2 -p1 -b.gettid
+%patch3 -p1 -b.386
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -185,6 +187,9 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Jun 04 2019 Stan Cox <scox@redhat.com> - 10.1.0-2
+- Use PRIx64 to fix i386 build
+
 * Wed May 29 2019 Stan Cox <scox@redhat.com> - 10.1.0-1
 - Update to 10.1.0
 
