@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 10.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -12,6 +12,7 @@ Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{ve
 Patch1: dyninst-10.1.0-result.patch
 Patch2: testsuite-10.1.0-gettid.patch
 Patch3: testsuite-10.1.0-386.patch
+Patch4: dyninst-10.1.0-aarch-regs.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{version}
@@ -85,6 +86,7 @@ making sure that dyninst works properly.
 %patch1 -p1 -b.result
 %patch2 -p1 -b.gettid
 %patch3 -p1 -b.386
+%patch4 -p1 -b.aarch
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -187,6 +189,9 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Fri Nov 15 2019 Stan Cox <scox@redhat.com> - 10.1.0-4
+- Fix rhbz963475 dyninst must be ported to aarch64 
+
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
