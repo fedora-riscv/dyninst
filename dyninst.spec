@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://www.dyninst.org
 Version: 10.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -189,6 +189,9 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Fri Nov 15 2019 Stan Cox <scox@redhat.com> - 10.1.0-4
 - Fix rhbz963475 dyninst must be ported to aarch64 
 
