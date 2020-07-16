@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://www.dyninst.org
 Version: 10.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -27,7 +27,7 @@ BuildRequires: libtirpc-devel
 BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
-BuildRequires: gcc-gfortran glibc-static libstdc++-static nasm libxml2-devel
+BuildRequires: gcc-gfortran nasm libxml2-devel
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -62,19 +62,10 @@ dyninst-devel includes the C header files that specify the Dyninst user-space
 libraries and interfaces. This is required for rebuilding any program
 that uses Dyninst.
 
-%package static
-Summary: Static libraries for the compiling programs with Dyninst
-Requires: dyninst-devel = %{version}-%{release}
-%description static
-dyninst-static includes the static versions of the library files for
-the dyninst user-space libraries and interfaces.
-
 %package testsuite
 Summary: Programs for testing Dyninst
 Requires: dyninst = %{version}-%{release}
 Requires: dyninst-devel = %{version}-%{release}
-Requires: dyninst-static = %{version}-%{release}
-Requires: glibc-static
 %description testsuite
 dyninst-testsuite includes the test harness and target programs for
 making sure that dyninst works properly.
@@ -103,7 +94,6 @@ CXXFLAGS="$CFLAGS"
 export CFLAGS CXXFLAGS LDFLAGS
 
 %cmake \
- -DENABLE_STATIC_LIBS=1 \
  -DINSTALL_LIB_DIR:PATH=%{_libdir}/dyninst \
  -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
  -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
@@ -151,6 +141,7 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %{_libdir}/dyninst/*.so.*
 # dyninst mutators dlopen the runtime library
 %{_libdir}/dyninst/libdyninstAPI_RT.so
+%{_libdir}/dyninst/libdyninstAPI_RT.a
 
 %doc %{dyninst_base}/COPYRIGHT
 %doc %{dyninst_base}/LICENSE.md
@@ -173,9 +164,6 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %{_libdir}/dyninst/*.so
 %{_libdir}/cmake/Dyninst
 
-%files static
-%{_libdir}/dyninst/*.a
-
 %files testsuite
 %{_bindir}/parseThat
 %exclude %{_bindir}/cfg_to_dot
@@ -189,6 +177,9 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Jul 15 2020 Stan Cox <scox@redhat.com> - 10.1.0-7
+- Do not build static versions of the dyninst libraries.
+
 * Fri May 29 2020 Jonathan Wakely <jwakely@redhat.com> - 10.1.0-6
 - Rebuilt for Boost 1.73
 
