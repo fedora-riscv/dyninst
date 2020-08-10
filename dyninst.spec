@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://www.dyninst.org
 Version: 10.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -98,14 +98,13 @@ export CFLAGS CXXFLAGS LDFLAGS
  -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
  -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
  -DCMAKE_BUILD_TYPE=None \
- -DCMAKE_SKIP_RPATH:BOOL=YES \
- .
-%make_build
+ -DCMAKE_SKIP_RPATH:BOOL=YES
+%cmake_build
 
 # Hack to install dyninst nearby, so the testsuite can use it
-make DESTDIR=../install install
+DESTDIR="../install" %__cmake --install "%{__cmake_builddir}"
 find ../install -name '*.cmake' -execdir \
-     sed -i -e 's!%{_prefix}!../install&!' '{}' '+'
+     sed -i -e "s!%{_prefix}!$PWD/../install&!" '{}' '+'
 # cmake mistakenly looks for libtbb.so in the dyninst install dir
 sed -i '/libtbb.so/ s/".*usr/"\/usr/' $PWD/../install%{_libdir}/cmake/Dyninst/commonTargets.cmake
 
@@ -115,20 +114,19 @@ cd ../%{testsuite_base}
  -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
  -DCMAKE_BUILD_TYPE:STRING=Debug \
  -DCMAKE_SKIP_RPATH:BOOL=YES \
- .
-%make_build
+%cmake_build
 
 %install
 
 cd %{dyninst_base}
-%make_install
+%cmake_install
 
 # It doesn't install docs the way we want, so remove them.
 # We'll just grab the pdfs later, directly from the build dir.
 rm -v %{buildroot}%{_docdir}/*-%{version}.pdf
 
 cd ../%{testsuite_base}
-%make_install
+%cmake_install
 
 mkdir -p %{buildroot}/etc/ld.so.conf.d
 echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
@@ -177,6 +175,9 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon Aug 10 2020 Orion Poplawski <orion@nwra.com> - 10.1.0-10
+- Use new cmake macros (FTBFS bz#1863463)
+
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-9
 - Second attempt - Rebuilt for
   https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
