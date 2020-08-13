@@ -25,6 +25,7 @@ BuildRequires: binutils-devel
 BuildRequires: cmake
 BuildRequires: libtirpc-devel
 BuildRequires: tbb tbb-devel
+BuildRequires: tex-latex
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran nasm libxml2-devel
@@ -177,6 +178,7 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %changelog
 * Mon Aug 10 2020 Orion Poplawski <orion@nwra.com> - 10.1.0-10
 - Use new cmake macros (FTBFS bz#1863463)
+- Add BR tex-latex for doc build
 
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-9
 - Second attempt - Rebuilt for
