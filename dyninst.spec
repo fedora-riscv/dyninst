@@ -1,21 +1,21 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 10%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 10.1.0
+Version: 10.2.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 
+%define __testsuite_version 10.1.0
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
-Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{version}.tar.gz
+Source1: https://github.com/dyninst/testsuite/archive/v10.1.0/testsuite-%{__testsuite_version}.tar.gz
 
-Patch1: dyninst-10.1.0-result.patch
+Patch1: dyninst-10.2.0-pie.patch
 Patch2: testsuite-10.1.0-gettid.patch
 Patch3: testsuite-10.1.0-386.patch
-Patch4: dyninst-10.1.0-aarch-regs.patch
 
 %global dyninst_base dyninst-%{version}
-%global testsuite_base testsuite-%{version}
+%global testsuite_base testsuite-%{__testsuite_version}
 
 BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
@@ -28,7 +28,7 @@ BuildRequires: tbb tbb-devel
 BuildRequires: tex-latex
 
 # Extra requires just for the testsuite
-BuildRequires: gcc-gfortran nasm libxml2-devel
+BuildRequires: gcc-gfortran libxml2-devel
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -75,10 +75,9 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1 -b.result
+%patch1 -p1 -b.pie
 %patch2 -p1 -b.gettid
 %patch3 -p1 -b.386
-%patch4 -p1 -b.aarch
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -91,6 +90,10 @@ cd %{dyninst_base}
 
 CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
+%ifarch %{ix86}
+    CFLAGS="$CFLAGS -fno-lto"
+    LDFLAGS="$LDFLAGS -fno-lto"
+%endif    
 CXXFLAGS="$CFLAGS"
 export CFLAGS CXXFLAGS LDFLAGS
 
@@ -165,17 +168,14 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 
 %files testsuite
 %{_bindir}/parseThat
-%exclude %{_bindir}/cfg_to_dot
-%exclude /usr/bin/codeCoverage
-%exclude /usr/bin/unstrip
-%exclude /usr/bin/ddb.db
-%exclude /usr/bin/params.db
-%exclude /usr/bin/unistd.db
 %dir %{_libdir}/dyninst/testsuite/
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*[!a]
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Sep 01 2020 Stan Cox <scox@redhat.com> - 10.2.0-1
+- Update to 10.2.0
+
 * Mon Aug 10 2020 Orion Poplawski <orion@nwra.com> - 10.1.0-10
 - Use new cmake macros (FTBFS bz#1863463)
 - Add BR tex-latex for doc build

@@ -1,3 +1,18 @@
+--- dyninst-10.1.0/testsuite-10.1.0/CMakeLists.txt
++++ dyninst-10.1.0/testsuite-10.1.0/CMakeLists.txt
+@@ -111,7 +111,8 @@
+ if(UNIX)
+   enable_language(ASM-ATT)
+-  if("${DYNINST_PLATFORM}" MATCHES "i386")
+-    enable_language(ASM_NASM)
+-  endif()
++# nasm/yasm are deprecated
++#  if("${DYNINST_PLATFORM}" MATCHES "i386")
++#    enable_language(ASM_NASM)
++#  endif()
+ elseif(WIN32)
+   enable_language(ASM_MASM)
+
 --- dyninst-10.1.0/testsuite-10.1.0/src/instruction/test_instruction_farcall.C
 +++ dyninst-10.1.0/testsuite-10.1.0/src/instruction/test_instruction_farcall.C
 @@ -96,21 +96,21 @@ test_results_t test_instruction_farcall_Mutator::executeTest()
