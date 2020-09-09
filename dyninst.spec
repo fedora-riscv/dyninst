@@ -91,7 +91,7 @@ cd %{dyninst_base}
 CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
 %ifarch %{ix86}
-    CFLAGS="$CFLAGS -fno-lto"
+    CFLAGS="$CFLAGS -fno-lto -march=i686"
     LDFLAGS="$LDFLAGS -fno-lto"
 %endif    
 CXXFLAGS="$CFLAGS"
