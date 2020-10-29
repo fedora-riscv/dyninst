@@ -1,19 +1,20 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 2%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 10.2.0
+Version: 10.2.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 
 %define __testsuite_version 10.1.0
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
 Source1: https://github.com/dyninst/testsuite/archive/v10.1.0/testsuite-%{__testsuite_version}.tar.gz
 
-Patch1: dyninst-10.2.0-pie.patch
-Patch2: testsuite-10.1.0-gettid.patch
-Patch3: testsuite-10.1.0-386.patch
-Patch4: %{name}-gcc11.patch
+Patch1: %{name}-gcc11.patch
+Patch2: %{name}-10.2.1-dbid.patch
+Patch3: testsuite-10.1.0-gettid.patch
+Patch4: testsuite-10.1.0-386.patch
+Patch5: testsuite-10.1.0-throw.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{__testsuite_version}
@@ -76,10 +77,11 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1 -b.pie
-%patch2 -p1 -b.gettid
-%patch3 -p1 -b.386
-%patch4 -p1 -b .gcc11
+%patch1 -p1 -b .gcc11
+%patch2 -p1 -b .dbid
+%patch3 -p1 -b .gettid
+%patch4 -p1 -b .386
+%patch5 -p1 -b .throw
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -175,6 +177,9 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Oct 28 2020 Stan Cox <scox@redhat.com> - 10.2.1-1
+- Update to 10.2.1
+
 * Tue Oct 27 2020 Jeff Law <law@redhat.com> - 10.2.0-2
 - Fix C++17 issue caught by gcc-11
 
