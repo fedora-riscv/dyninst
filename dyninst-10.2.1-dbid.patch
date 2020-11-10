@@ -92,18 +92,9 @@ https://sourceware.org/elfutils/Debuginfod.html
  elseif(NOT (LibElf_FOUND AND LibDwarf_FOUND) AND STERILE_BUILD)
    message(FATAL_ERROR "Elfutils not found and cannot be downloaded because build is sterile.")
  else()
-@@ -104,7 +121,7 @@ else()
-   if(NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR NOT (${CMAKE_C_COMPILER_ID} STREQUAL "GNU"))
-     message(FATAL_ERROR "ElfUtils will only build with the GNU compiler")
-   endif()
--  
-+
-   include(ExternalProject)
-   externalproject_add(
-     ElfUtils
 
---- /dedyninst-10.2.1/dyninst-10.2.1/null
-+++ b/cmake/Modules/FindLibDebuginfod.cmake
+--- /dev/null
++++ dyninst-10.2.1/dyninst-10.2.1/cmake/Modules/FindLibDebuginfod.cmake
 @@ -0,0 +1,76 @@
 +#========================================================================================
 +# FindDebuginfod

@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 10.2.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -22,6 +22,7 @@ Patch5: testsuite-10.1.0-throw.patch
 BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
 BuildRequires: elfutils-libelf-devel
+BuildRequires: elfutils-debuginfod-client-devel
 BuildRequires: boost-devel
 BuildRequires: binutils-devel
 BuildRequires: cmake
@@ -102,6 +103,7 @@ CXXFLAGS="$CFLAGS"
 export CFLAGS CXXFLAGS LDFLAGS
 
 %cmake \
+ -DENABLE_DEBUGINFOD=1 \
  -DINSTALL_LIB_DIR:PATH=%{_libdir}/dyninst \
  -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
  -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
@@ -138,6 +140,13 @@ cd ../%{testsuite_base}
 
 mkdir -p %{buildroot}/etc/ld.so.conf.d
 echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
+
+# Ugly hack to mask testsuite files from debuginfo extraction.  Running the
+# testsuite requires debuginfo, so extraction is useless.  However, debuginfo
+# extraction is still nice for the main libraries, so we don't want to disable
+# it package-wide.  The permissions are restored by attr(755,-,-) in files.
+find %{buildroot}%{_libdir}/dyninst/testsuite/ \
+  -type f '!' -name '*.a' -execdir chmod 644 '{}' '+'
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -177,6 +186,9 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Nov 10 2020 Stan Cox <scox@redhat.com> - 10.2.1-2
+- Enable debuginfod
+
 * Wed Oct 28 2020 Stan Cox <scox@redhat.com> - 10.2.1-1
 - Update to 10.2.1
 
