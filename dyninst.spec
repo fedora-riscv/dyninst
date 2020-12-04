@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 2%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
 Version: 10.2.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -186,10 +186,7 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
-* Tue Nov 10 2020 Stan Cox <scox@redhat.com> - 10.2.1-2
-- Enable debuginfod
-
-* Wed Oct 28 2020 Stan Cox <scox@redhat.com> - 10.2.1-1
+* Mon Dec 07 2020 Stan Cox <scox@redhat.com> - 10.2.1-1
 - Update to 10.2.1
 
 * Tue Oct 27 2020 Jeff Law <law@redhat.com> - 10.2.0-2
