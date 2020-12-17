@@ -32,6 +32,7 @@ BuildRequires: tex-latex
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran libxml2-devel
+BuildRequires: make
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
