@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://www.dyninst.org
 Version: 10.2.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -23,7 +23,7 @@ BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
 BuildRequires: elfutils-libelf-devel
 BuildRequires: elfutils-debuginfod-client-devel
-BuildRequires: boost-devel
+BuildRequires: boost-devel >= 1.75
 BuildRequires: binutils-devel
 BuildRequires: cmake
 BuildRequires: libtirpc-devel
@@ -187,6 +187,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Fri Jan 29 2021 Frank Ch. Eigler <fche@redhat.com> - 10.2.1-5
+- Rebuilt for Boost 1.75 for sure, via buildrequire version constraints
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 10.2.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
