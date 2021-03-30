@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://www.dyninst.org
 Version: 10.2.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -187,6 +187,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Mar 30 2021 Jonathan Wakely <jwakely@redhat.com> - 10.2.1-6
+- Rebuilt for removed libstdc++ symbol (#1937698)
+
 * Fri Jan 29 2021 Frank Ch. Eigler <fche@redhat.com> - 10.2.1-5
 - Rebuilt for Boost 1.75 for sure, via buildrequire version constraints
 
