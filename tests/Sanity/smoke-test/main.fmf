@@ -1,0 +1,16 @@
+summary: The test does basic instrumentation on binaries.
+description: ''
+contact:
+- Michael Petlan <mpetlan@redhat.com>
+component:
+- dyninst
+test: ./runtest.sh
+framework: beakerlib
+recommend:
+- dyninst
+- dyninst-devel
+- gcc
+- gcc-c++
+duration: 12m
+extra-summary: /tools/dyninst/Sanity/smoke-test
+extra-task: /tools/dyninst/Sanity/smoke-test
