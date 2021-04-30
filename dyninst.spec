@@ -1,23 +1,20 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 6%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 10.2.1
+Version: 11.0.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 
-%define __testsuite_version 10.1.0
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
-Source1: https://github.com/dyninst/testsuite/archive/v10.1.0/testsuite-%{__testsuite_version}.tar.gz
+Source1: https://github.com/dyninst/testsuite/archive/%{version}/testsuite-%{version}.tar.gz
 
-Patch1: %{name}-gcc11.patch
-Patch2: %{name}-10.2.1-dbid.patch
-Patch3: testsuite-10.1.0-gettid.patch
-Patch4: testsuite-10.1.0-386.patch
-Patch5: testsuite-10.1.0-throw.patch
+Patch1: testsuite-11.0.0-test12.patch
+Patch2: testsuite-11.0.0-386.patch
+Patch3: dyninst-11.0.0-dwarf.patch
 
 %global dyninst_base dyninst-%{version}
-%global testsuite_base testsuite-%{__testsuite_version}
+%global testsuite_base testsuite-%{version}
 
 BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
@@ -79,11 +76,9 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1 -b .gcc11
-%patch2 -p1 -b .dbid
-%patch3 -p1 -b .gettid
-%patch4 -p1 -b .386
-%patch5 -p1 -b .throw
+%patch1 -p1 -b .test12
+%patch2 -p1 -b .386
+%patch3 -p1 -b .dwarf
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -187,6 +182,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Fri Apr 30 2021 Stan Cox <scox@redhat.com> - 11.0.0
+- Update to 11.0.0
+
 * Tue Mar 30 2021 Jonathan Wakely <jwakely@redhat.com> - 10.2.1-6
 - Rebuilt for removed libstdc++ symbol (#1937698)
 
