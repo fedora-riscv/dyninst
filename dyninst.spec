@@ -1,17 +1,18 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
+Group: Development/Libraries
 Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 11.0.0
+Version: 11.0.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
 Source1: https://github.com/dyninst/testsuite/archive/%{version}/testsuite-%{version}.tar.gz
 
-Patch1: testsuite-11.0.0-test12.patch
-Patch2: testsuite-11.0.0-386.patch
-Patch3: dyninst-11.0.0-dwarf.patch
+Patch1: dyninst-11.0.1-dwarf.patch
+Patch2: dyninst-11.0.1-rosebc.patch
+Patch3: testsuite-11.0.1-386.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{version}
@@ -20,7 +21,7 @@ BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
 BuildRequires: elfutils-libelf-devel
 BuildRequires: elfutils-debuginfod-client-devel
-BuildRequires: boost-devel >= 1.75
+BuildRequires: boost-devel
 BuildRequires: binutils-devel
 BuildRequires: cmake
 BuildRequires: libtirpc-devel
@@ -50,11 +51,13 @@ the creation of tools and applications that use run-time code patching.
 
 %package doc
 Summary: Documentation for using the Dyninst API
+Group: Documentation
 %description doc
 dyninst-doc contains API documentation for the Dyninst libraries.
 
 %package devel
 Summary: Header files for compiling programs with Dyninst
+Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: boost-devel
 Requires: tbb-devel
@@ -66,6 +69,7 @@ that uses Dyninst.
 
 %package testsuite
 Summary: Programs for testing Dyninst
+Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: dyninst-devel = %{version}-%{release}
 %description testsuite
@@ -76,9 +80,14 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1 -b .test12
-%patch2 -p1 -b .386
+pushd %{dyninst_base}
+%patch1 -p1 -b .386
+%patch2 -p1 -b .rose
+popd
+
+pushd %{testsuite_base}
 %patch3 -p1 -b .dwarf
+popd
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -104,7 +113,8 @@ export CFLAGS CXXFLAGS LDFLAGS
  -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
  -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
  -DCMAKE_BUILD_TYPE=None \
- -DCMAKE_SKIP_RPATH:BOOL=YES
+ -DCMAKE_SKIP_RPATH:BOOL=YES \
+ .
 %cmake_build
 
 # Hack to install dyninst nearby, so the testsuite can use it
@@ -120,6 +130,7 @@ cd ../%{testsuite_base}
  -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
  -DCMAKE_BUILD_TYPE:STRING=Debug \
  -DCMAKE_SKIP_RPATH:BOOL=YES \
+ .
 %cmake_build
 
 %install
@@ -182,6 +193,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu Jul 08 2021 Stan Cox <scox@redhat.com> - 11.0.1
+- Update to 11.0.1
+
 * Fri Apr 30 2021 Stan Cox <scox@redhat.com> - 11.0.0
 - Update to 11.0.0
 

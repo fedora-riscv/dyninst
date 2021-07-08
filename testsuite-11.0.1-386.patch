@@ -1,5 +1,5 @@
---- dyninst-11.0.0/testsuite-11.0.0/CMakeLists.txt
-+++ dyninst-11.0.0/testsuite-11.0.0/CMakeLists.txt
+--- testsuite-11.0.1/CMakeLists.txt
++++ testsuite-11.0.1/CMakeLists.txt
 @@ -111,7 +111,8 @@
  if(UNIX)
    enable_language(ASM-ATT)

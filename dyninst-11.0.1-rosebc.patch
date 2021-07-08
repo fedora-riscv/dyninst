@@ -1,0 +1,11 @@
+rhbz1973038
+
+--- dyninst-11.0.1/dataflowAPI/src/RoseInsnFactory.C.orig	2021-06-09 15:54:21.753883619 -0400
++++ dyninst-11.0.1/dataflowAPI/src/RoseInsnFactory.C	2021-06-23 14:17:37.854933719 -0400
+@@ -317,5 +317,5 @@
+     // It looks like the ROSE semantics code will infer the target from 
+     // the bo field. So, what is passed in as the third operands does not matter
+-    if(branch_target) {
++    if(branch_target || iapi_opcode == power_op_bc) {
+       rose_operands->append_operand(new SgAsmDoubleWordValueExpression(branch_target));
+     } else if(power_op_bcctr == iapi_opcode) {
