@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 11.0.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -12,7 +12,8 @@ Source1: https://github.com/dyninst/testsuite/archive/%{version}/testsuite-%{ver
 
 Patch1: dyninst-11.0.1-dwarf.patch
 Patch2: dyninst-11.0.1-rosebc.patch
-Patch3: testsuite-11.0.1-386.patch
+Patch3: dyninst-11.0.1-aarch64.patch
+Patch4: testsuite-11.0.1-386.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{version}
@@ -83,10 +84,11 @@ making sure that dyninst works properly.
 pushd %{dyninst_base}
 %patch1 -p1 -b .386
 %patch2 -p1 -b .rose
+%patch3 -p1 -b .aarch64
 popd
 
 pushd %{testsuite_base}
-%patch3 -p1 -b .dwarf
+%patch4 -p1 -b .dwarf
 popd
 
 # cotire seems to cause non-deterministic gcc errors
@@ -193,6 +195,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Nov 09 2021 Stan Cox <scox@redhat.com> - 11.0.1-4
+- Do not create reloc for aarch64 static calls
+
 * Fri Aug 06 2021 Jonathan Wakely <jwakely@redhat.com> - 11.0.1-3
 - Rebuilt for Boost 1.76
 
