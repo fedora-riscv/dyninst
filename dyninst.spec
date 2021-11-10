@@ -127,6 +127,8 @@ find ../install -name '*.cmake' -execdir \
 sed -i '/libtbb.so/ s/".*usr/"\/usr/' $PWD/../install%{_libdir}/cmake/Dyninst/commonTargets.cmake
 
 cd ../%{testsuite_base}
+# testsuite build sometimes encounters dependency issues with -jN
+%define _smp_mflags -j1
 %cmake \
  -DDyninst_DIR:PATH=$PWD/../install%{_libdir}/cmake/Dyninst \
  -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
