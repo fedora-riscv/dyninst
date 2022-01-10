@@ -2,21 +2,19 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 4%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 11.0.1
+Version: 12.0.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 
+%define __testsuite_version 12.0.0
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
-Source1: https://github.com/dyninst/testsuite/archive/%{version}/testsuite-%{version}.tar.gz
+Source1: https://github.com/dyninst/testsuite/archive/%{__testsuite_version}/testsuite-%{__testsuite_version}.tar.gz
 
-Patch1: dyninst-11.0.1-dwarf.patch
-Patch2: dyninst-11.0.1-rosebc.patch
-Patch3: dyninst-11.0.1-aarch64.patch
-Patch4: testsuite-11.0.1-386.patch
+Patch1: rhbz2034662.patch
 
 %global dyninst_base dyninst-%{version}
-%global testsuite_base testsuite-%{version}
+%global testsuite_base testsuite-%{__testsuite_version}
 
 BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
@@ -82,13 +80,10 @@ making sure that dyninst works properly.
 %setup -q -T -D -a 1
 
 pushd %{dyninst_base}
-%patch1 -p1 -b .386
-%patch2 -p1 -b .rose
-%patch3 -p1 -b .aarch64
+%patch1 -p1 -b .2034662
 popd
 
 pushd %{testsuite_base}
-%patch4 -p1 -b .dwarf
 popd
 
 # cotire seems to cause non-deterministic gcc errors
@@ -197,6 +192,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon Jan 10 2022 Stan Cox <scox@redhat.com> - 12.0.1-1
+- Update to 12.0.1
+
 * Tue Nov 09 2021 Stan Cox <scox@redhat.com> - 11.0.1-4
 - Do not create reloc for aarch64 static calls
 
