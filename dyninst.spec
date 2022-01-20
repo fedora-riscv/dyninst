@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 12.0.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -192,6 +192,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Mon Jan 10 2022 Stan Cox <scox@redhat.com> - 12.0.1-1
 - Update to 12.0.1
 
