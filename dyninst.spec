@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://www.dyninst.org
 Version: 12.0.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -12,6 +12,7 @@ Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{versio
 Source1: https://github.com/dyninst/testsuite/archive/%{__testsuite_version}/testsuite-%{__testsuite_version}.tar.gz
 
 Patch1: rhbz2034662.patch
+Patch2: dwarf-error.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{__testsuite_version}
@@ -81,6 +82,7 @@ making sure that dyninst works properly.
 
 pushd %{dyninst_base}
 %patch1 -p1 -b .2034662
+%patch2 -p1 -b .dwerr
 popd
 
 pushd %{testsuite_base}
@@ -192,6 +194,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Mon Feb 07 2022 Stan Cox <scox@redhat.com> - 12.0.1-3
+- Quiesce dwarf 5 warnings
+
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12.0.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 

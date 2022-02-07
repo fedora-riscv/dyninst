@@ -3,8 +3,8 @@ Remove interposed definition of _r_debug
 Previously there was a dynamic relocation against _r_debug in the loader which picked up the interposed definition,
 but glibc now uses a direct internal hidden symbol reference and thus no longer updates the interposed object.
 
---- dyninst-12.0.0/dyninstAPI_RT/src/RTlinux.c
-+++ dyninst-12.0.0/dyninstAPI_RT/src/RTlinux.c
+--- dyninst-12.0.1/dyninstAPI_RT/src/RTlinux.c
++++ dyninst-12.0.1/dyninstAPI_RT/src/RTlinux.c
 @@ -404,7 +404,6 @@ void dyninstTrapHandler(int sig, siginfo_t *sg, ucontext_t *context)
  #if defined(cap_binary_rewriter)
  
