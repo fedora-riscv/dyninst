@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 12.0.1
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -112,8 +112,7 @@ export CFLAGS CXXFLAGS LDFLAGS
  -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
  -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
  -DCMAKE_BUILD_TYPE=None \
- -DCMAKE_SKIP_RPATH:BOOL=YES \
- .
+ -DCMAKE_SKIP_RPATH:BOOL=YES
 %cmake_build
 
 # Hack to install dyninst nearby, so the testsuite can use it
@@ -130,8 +129,7 @@ cd ../%{testsuite_base}
  -DDyninst_DIR:PATH=$PWD/../install%{_libdir}/cmake/Dyninst \
  -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
  -DCMAKE_BUILD_TYPE:STRING=Debug \
- -DCMAKE_SKIP_RPATH:BOOL=YES \
- .
+ -DCMAKE_SKIP_RPATH:BOOL=YES
 %cmake_build
 
 %install
@@ -194,6 +192,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Sat Mar 05 2022 Orion Poplawski <orion@nwra.com> - 12.0.1-4
+- Fix cmake build dir
+
 * Mon Feb 07 2022 Stan Cox <scox@redhat.com> - 12.0.1-3
 - Quiesce dwarf 5 warnings
 
