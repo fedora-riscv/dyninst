@@ -2,16 +2,15 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 4%{?dist}
+Release: 1%{?dist}
 URL: http://www.dyninst.org
-Version: 12.0.1
+Version: 12.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 
-%define __testsuite_version 12.0.0
+%define __testsuite_version 12.1.0
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
 Source1: https://github.com/dyninst/testsuite/archive/%{__testsuite_version}/testsuite-%{__testsuite_version}.tar.gz
 
-Patch1: rhbz2034662.patch
 Patch2: dwarf-error.patch
 
 %global dyninst_base dyninst-%{version}
@@ -81,7 +80,6 @@ making sure that dyninst works properly.
 %setup -q -T -D -a 1
 
 pushd %{dyninst_base}
-%patch1 -p1 -b .2034662
 %patch2 -p1 -b .dwerr
 popd
 
@@ -192,6 +190,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu Mar 10 2022 William Cohen <wcohen@redhat.com> - 12.1.0-1
+- Update to 12.1.0
+
 * Sat Mar 05 2022 Orion Poplawski <orion@nwra.com> - 12.0.1-4
 - Fix cmake build dir
 
