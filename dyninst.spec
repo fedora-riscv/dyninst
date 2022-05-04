@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://www.dyninst.org
 Version: 12.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -190,6 +190,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed May 04 2022 Thomas Rodgers <trodgers@redhat.com> - 12.1.0-2
+- Rebuilt for Boost 1.78
+
 * Thu Mar 10 2022 William Cohen <wcohen@redhat.com> - 12.1.0-1
 - Update to 12.1.0
 
