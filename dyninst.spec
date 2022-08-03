@@ -2,7 +2,7 @@ Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
 Group: Development/Libraries
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.dyninst.org
 Version: 12.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -11,7 +11,8 @@ ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
 Source1: https://github.com/dyninst/testsuite/archive/%{__testsuite_version}/testsuite-%{__testsuite_version}.tar.gz
 
-Patch2: dwarf-error.patch
+Patch1: dwarf-error.patch
+Patch2: cmdline.patch
 
 %global dyninst_base dyninst-%{version}
 %global testsuite_base testsuite-%{__testsuite_version}
@@ -80,10 +81,11 @@ making sure that dyninst works properly.
 %setup -q -T -D -a 1
 
 pushd %{dyninst_base}
-%patch2 -p1 -b .dwerr
+%patch1 -p1 -b .dwerr
 popd
 
 pushd %{testsuite_base}
+%patch2 -p1 -b .cmdline
 popd
 
 # cotire seems to cause non-deterministic gcc errors
@@ -190,6 +192,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Wed Aug 03 2022 Stan Cox <scox@redhat.com> - 12.1.0-4
+- Explicitly include time.h as <string> no longer pulls it in
+
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12.1.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
