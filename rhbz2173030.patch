@@ -1,0 +1,62 @@
+commit 358db4610e4919690d928797713bef3cf67ef61d
+gpg: Signature made Wed 22 Feb 2023 10:51:01 AM EST
+gpg:                using RSA key 4AEE18F83AFDEB23
+gpg: Good signature from "GitHub (web-flow commit signing) <noreply@github.com>" [full]
+Author: kupsch <kupsch@cs.wisc.edu>
+Date:   Wed Feb 22 09:51:01 2023 -0600
+
+    explicitly include <array> (#1384)
+    
+    - std::array is used in this file, but not included explicitly as
+      on many systems this header is implicitly included recursively
+      via another included file.  On new versions of headers this may
+      no longer be the case, so explicitly include it.
+
+diff --git a/instructionAPI/src/InstructionDecoder-aarch64.h b/instructionAPI/src/InstructionDecoder-aarch64.h
+index 7994d0b1cc81..ae516232a68b 100644
+--- a/instructionAPI/src/InstructionDecoder-aarch64.h
++++ b/instructionAPI/src/InstructionDecoder-aarch64.h
+@@ -28,6 +28,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
++#include <array>
+ #include "InstructionDecoderImpl.h"
+ #include <iostream>
+ #include "Immediate.h"
+
+commit 0cd2b8b7858f48cd60e070010bb6600a1f44180e
+gpg: Signature made Wed 22 Feb 2023 04:03:20 PM EST
+gpg:                using RSA key 4AEE18F83AFDEB23
+gpg: Good signature from "GitHub (web-flow commit signing) <noreply@github.com>" [full]
+Author: Tim Haines <thaines.astro@gmail.com>
+Date:   Wed Feb 22 15:03:20 2023 -0600
+
+    Add missing <array> includes (#1385)
+    
+    These were showing up on ufront@rice.
+
+diff --git a/instructionAPI/src/AMDGPU/cdna2/InstructionDecoder-amdgpu-cdna2.C b/instructionAPI/src/AMDGPU/cdna2/InstructionDecoder-amdgpu-cdna2.C
+index e852f47437a1..f62b1f5463e8 100644
+--- a/instructionAPI/src/AMDGPU/cdna2/InstructionDecoder-amdgpu-cdna2.C
++++ b/instructionAPI/src/AMDGPU/cdna2/InstructionDecoder-amdgpu-cdna2.C
+@@ -30,6 +30,7 @@
+ 
+ #include "Ternary.h"
+ #include "InstructionDecoder-amdgpu-cdna2.h"
++#include <array>
+ 
+ namespace Dyninst {
+ 	namespace InstructionAPI {
+diff --git a/instructionAPI/src/AMDGPU/vega/InstructionDecoder-amdgpu-vega.C b/instructionAPI/src/AMDGPU/vega/InstructionDecoder-amdgpu-vega.C
+index 449255ae00b4..3093ece41002 100644
+--- a/instructionAPI/src/AMDGPU/vega/InstructionDecoder-amdgpu-vega.C
++++ b/instructionAPI/src/AMDGPU/vega/InstructionDecoder-amdgpu-vega.C
+@@ -30,6 +30,7 @@
+ 
+ #include "Ternary.h"
+ #include "InstructionDecoder-amdgpu-vega.h"
++#include <array>
+ 
+ namespace Dyninst {
+ 	namespace InstructionAPI {
