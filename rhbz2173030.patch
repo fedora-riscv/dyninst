@@ -60,3 +60,29 @@ index 449255ae00b4..3093ece41002 100644
  
  namespace Dyninst {
  	namespace InstructionAPI {
+commit 2e3bf92eedf575c780e4381ae810a050ee404f03
+gpg: Signature made Thu 05 Jan 2023 02:13:14 PM EST
+gpg:                using RSA key 4AEE18F83AFDEB23
+gpg: Good signature from "GitHub (web-flow commit signing) <noreply@github.com>" [full]
+Author: kupsch <kupsch@cs.wisc.edu>
+Date:   Thu Jan 5 13:13:14 2023 -0600
+
+    add missing include file (#1344)
+    
+    - add missing #include <deque>
+    
+      On more platforms and library combinations <deque> is included via
+      some other header, but there is combination where this is not true
+
+diff --git a/dataflowAPI/src/AbslocInterface.C b/dataflowAPI/src/AbslocInterface.C
+index 9d7ad000c2b6..582e64004967 100644
+--- a/dataflowAPI/src/AbslocInterface.C
++++ b/dataflowAPI/src/AbslocInterface.C
+@@ -29,6 +29,7 @@
+  */
+ 
+ 
++#include <deque>
+ #include "Absloc.h"
+ #include "AbslocInterface.h"
+ 
