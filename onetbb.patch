@@ -1,0 +1,89 @@
+--- dyninst-12.2.0/cmake/Modules/FindTBB.cmake~	2023-06-27 22:52:25.396598265 +0100
++++ dyninst-12.2.0/cmake/Modules/FindTBB.cmake	2023-06-27 22:52:27.776601825 +0100
+@@ -154,7 +154,8 @@
+ if(TBB_INCLUDE_DIRS)
+     # Starting in 2020.1.1, tbb_stddef.h is replaced by version.h
+     set(_version_files "${TBB_INCLUDE_DIRS}/tbb/tbb_stddef.h"
+-                       "${TBB_INCLUDE_DIRS}/tbb/version.h")
++                       "${TBB_INCLUDE_DIRS}/tbb/version.h"
++                       "${TBB_INCLUDE_DIRS}/oneapi/tbb/version.h")
+     foreach(f IN ITEMS ${_version_files})
+         if(EXISTS ${f})
+             set(_version_file ${f})
+--- dyninst-12.2.0/common/h/concurrent.h~	2023-06-27 23:31:35.971166585 +0100
++++ dyninst-12.2.0/common/h/concurrent.h	2023-06-27 23:32:31.889253848 +0100
+@@ -41,6 +41,22 @@
+ #include <tbb/concurrent_vector.h>
+ #include <tbb/concurrent_queue.h>
+ 
++#if __has_include(<tbb/version.h>)
++#include <tbb/version.h>
++#if TBB_INTERFACE_VERSION_MAJOR >= 12
++// oneTBB version of tbb_hash_compare doesn't work for std::pair.
++template<typename T, typename U>
++struct tbb::tbb_hash_compare<std::pair<T, U>> {
++    static size_t hash(const std::pair<T, U>& p) {
++      return tbb_hash_compare<T>().hash(p.first) ^ tbb_hash_compare<U>().hash(p.second);
++    }
++    static bool equal(const std::pair<T, U>& p1, const std::pair<T, U>& p2) {
++      return p1 == p2;
++    }
++};
++#endif
++#endif
++
+ namespace Dyninst {
+ 
+ namespace dyn_c_annotations {
+@@ -54,10 +70,10 @@
+ 
+ template<typename K, typename V>
+ class dyn_c_hash_map : protected tbb::concurrent_hash_map<K, V,
+-    tbb::tbb_hash_compare<K>, std::allocator<std::pair<K,V>>> {
++    tbb::tbb_hash_compare<K>, std::allocator<std::pair<const K,V>>> {
+ 
+     typedef tbb::concurrent_hash_map<K, V,
+-        tbb::tbb_hash_compare<K>, std::allocator<std::pair<K,V>>> base;
++        tbb::tbb_hash_compare<K>, std::allocator<std::pair<const K,V>>> base;
+ public:
+     using typename base::value_type;
+     using typename base::mapped_type;
+--- dyninst-12.2.0/symtabAPI/src/dwarfWalker.h~	2023-06-27 23:49:03.290956830 +0100
++++ dyninst-12.2.0/symtabAPI/src/dwarfWalker.h	2023-06-28 09:12:36.672398326 +0100
+@@ -35,22 +35,20 @@
+ }
+ }
+ 
+-namespace tbb {
+-    using namespace Dyninst::SymtabAPI;
+-    template<>
+-    struct tbb_hash_compare<type_key> {
+-        static size_t hash(const type_key& k) {
+-            size_t seed = 0;
+-            boost::hash_combine(seed, k.off);
+-            boost::hash_combine(seed, k.file);
+-            boost::hash_combine(seed, static_cast<void *>(k.m));
+-            return seed;
+-        }
+-        static bool equal(const type_key& k1, const type_key& k2) {
+-            return (k1.off==k2.off && k1.file==k2.file && k1.m==k2.m);
+-        }
+-    };
+-}
++template<>
++struct tbb::tbb_hash_compare<Dyninst::SymtabAPI::type_key> {
++    using type_key = Dyninst::SymtabAPI::type_key;
++    static size_t hash(const type_key& k) {
++        size_t seed = 0;
++        boost::hash_combine(seed, k.off);
++        boost::hash_combine(seed, k.file);
++        boost::hash_combine(seed, static_cast<void *>(k.m));
++        return seed;
++    }
++    static bool equal(const type_key& k1, const type_key& k2) {
++        return (k1.off==k2.off && k1.file==k2.file && k1.m==k2.m);
++    }
++};
+ 
+ namespace Dyninst {
+ namespace SymtabAPI {
