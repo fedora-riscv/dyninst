@@ -1,5 +1,5 @@
 Summary: An API for Run-time Code Generation
-License: LGPLv2+
+License: LGPL-2.1-or-later AND GPL-3.0-or-later WITH Bison-exception-2.2 AND LicenseRef-Fedora-Public-Domain AND BSD-3-Clause
 Name: dyninst
 Group: Development/Libraries
 Release: 1%{?dist}
@@ -56,6 +56,7 @@ Summary: Documentation for using the Dyninst API
 Group: Documentation
 %description doc
 dyninst-doc contains API documentation for the Dyninst libraries.
+License: LGPL-2.1-or-later
 
 %package devel
 Summary: Header files for compiling programs with Dyninst
@@ -63,6 +64,8 @@ Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: boost-devel
 Requires: tbb-devel
+License: LGPL-2.1-or-later AND BSD-3-Clause AND MIT
+# FindTBB.cmake: presumed MIT, removed in next version of dyninst
 
 %description devel
 dyninst-devel includes the C header files that specify the Dyninst user-space
@@ -74,6 +77,9 @@ Summary: Programs for testing Dyninst
 Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: dyninst-devel = %{version}-%{release}
+License: BSD-3-Clause AND LGPL-2.1-or-later
+
+
 %description testsuite
 dyninst-testsuite includes the test harness and target programs for
 making sure that dyninst works properly.
@@ -188,6 +194,9 @@ find %{buildroot}%{_libdir}/dyninst/testsuite/ \
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+
+* Tue Jul 04 2023 Frank Ch. Eigler <fche@redhat.com> - 12.3.0-1
+- migrated to SPDX license
 
 * Tue Jul 04 2023 Orion Poplawski <orion@nwra.com> - 12.3.0-1
 - Update to 12.3.0
