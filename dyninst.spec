@@ -2,10 +2,10 @@ Summary: An API for Run-time Code Generation
 License: LGPL-2.1-or-later AND GPL-3.0-or-later WITH Bison-exception-2.2 AND LicenseRef-Fedora-Public-Domain AND BSD-3-Clause
 Name: dyninst
 Group: Development/Libraries
-Release: 3%{?dist}
+Release: 3.rv64%{?dist}
 URL: http://www.dyninst.org
 Version: 12.3.0
-ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
+ExclusiveArch: %{ix86} x86_64 ppc64le aarch64 riscv64
 
 %define __testsuite_version 12.3.0
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
